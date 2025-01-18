@@ -1,0 +1,45 @@
+{
+  "name": "skelpro",
+  "version": "1.0.2",
+  "main": "./dist/src/index.js",
+  "description": "SkelPro – where projects get their bones structured.",
+  "scripts": {
+    "build": "tsc",
+    "start": "npx ts-node src/index.ts"
+  },
+  "keywords": [
+    "setup",
+    "Project setup",
+    "Templating"
+  ],
+  "author": {
+    "name": "Dieke Sydney",
+    "github": "https://github.com/Sydney205"
+  },
+  "license": "Apache",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sydney205/skelpro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sydney205/skelpro/issues"
+  },
+  "homepage": "https://github.com/Sydney205/skelpro#readme",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "commander": "^13.0.0",
+    "inquirer": "^12.3.0",
+    "json5": "^2.2.3",
+    "ora": "^5.4.1",
+    "tonelog": "^2.0.7",
+    "typeglide": "^1.2.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.10.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
