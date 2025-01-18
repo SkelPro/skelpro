@@ -5,6 +5,7 @@ export type JsonStructure = {
 export interface Answers {
   action: string;
   srcPath: string;
-  fileName: string;
   url: string;
+  fileName: string;
+  baseName: string;
 }

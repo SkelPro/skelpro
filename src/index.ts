@@ -24,7 +24,7 @@ export default async function main() {
   
   await typeglide({
     strings: [
-      tone.bright_cyan("\n\t\t💀 SkelPro"),
+      tone.bright_cyan("\n 💀 SkelPro"),
       tone.white(`The spookily smart tool that breathes life into your projects!\n`),
     ],
     backspace: false,
@@ -68,13 +68,20 @@ export default async function main() {
       when: (answers) => answers.action === "Fetch and Scaffold",
       validate: (input) => input ? true : "URL cannot be empty",
     },
+    {
+      type: "input",
+      name: "baseName",
+      message: "Whats's the name of your project:",
+      when: (answers) => answers.action === "Scaffold template" || answers.action === "Fetch and Scaffold",
+      validate: (input) => input ? true : "Project name name cannot be empty",
+    },
   ]);
 
   await setux(answers);
 }
 
 async function setux(answers: Answers) {
-  const spinner = ora("Bone by Bone, Hang on tight...").start();
+  const spinner = ora("Bone by Bone, Hang on tight...\n").start();
 
   try {
     switch (answers.action) {
@@ -83,11 +90,11 @@ async function setux(answers: Answers) {
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(answers.srcPath);
+        scaffoldTemplate(answers.srcPath, answers.baseName);
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(answers.url);
+        fetchTemplate(answers.url, answers.baseName);
         break;
       }
       case "Exit":

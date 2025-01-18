@@ -17,21 +17,21 @@ program
   });
 
 program
-  .command("generate-skeleton <dirPath> <tempName>")
+  .command("generate-skeleton <projectPath> <templateName>")
   .description("Generate a reusable template or should i say 'skeleton'")
-  .action((dirPath, tempName) => {
-    createTemplate(dirPath, tempName);
+  .action((projectPath, templateName) => {
+    createTemplate(projectPath, templateName);
   });
 
 
 program
-  .command("create <tempPath>")
+  .command("create <templatePath> <projectName>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
-  .action((tempPath) => {
-    if (tempPath.startsWith("http")) {
-      fetchTemplate(tempPath);
+  .action((templatePath, projectName) => {
+    if (templatePath.startsWith("http")) {
+      fetchTemplate(templatePath, projectName);
     } else {
-      scaffoldTemplate(tempPath)
+      scaffoldTemplate(templatePath, projectName)
     }
   });
 
