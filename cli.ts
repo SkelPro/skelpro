@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
-import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/features";
+import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
 const program = new Command();
 
@@ -17,7 +17,7 @@ program
   });
 
 program
-  .command("generate-skeleton <projectPath> <templateName>")
+  .command("generate <templateName> <projectPath>")
   .description("Generate a reusable template or should i say 'skeleton'")
   .action((projectPath, templateName) => {
     createTemplate(projectPath, templateName);
@@ -25,9 +25,9 @@ program
 
 
 program
-  .command("create <templatePath> <projectName>")
+  .command("create <projectName> <templatePath>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
-  .action((templatePath, projectName) => {
+  .action((projectName, templatePath) => {
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName);
     } else {

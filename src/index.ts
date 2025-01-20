@@ -3,7 +3,7 @@ import ora from "ora";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
 import type { Answers } from "./types/structures";
-import { createTemplate, scaffoldTemplate, fetchTemplate } from "./features"
+import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions"
 import asciiArt from "./utils/asciiArt";
 
 interface Actions {
