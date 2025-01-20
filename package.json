@@ -1,6 +1,6 @@
 {
   "name": "skelpro",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "./dist/src/index.js",
   "description": "SkelPro – where projects get their bones structured.",
   "scripts": {
@@ -12,19 +12,15 @@
     "Project setup",
     "Templating"
   ],
-  "author": {
-    "name": "Dieke Sydney",
-    "github": "https://github.com/Sydney205"
-  },
   "license": "Apache",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sydney205/skelpro.git"
+    "url": "git+https://github.com/SkelPro/skelpro.git"
   },
   "bugs": {
-    "url": "https://github.com/Sydney205/skelpro/issues"
+    "url": "https://github.com/SkelPro/skelpro/issues"
   },
-  "homepage": "https://github.com/Sydney205/skelpro#readme",
+  "homepage": "https://github.com/SkelPro/skelpro#readme",
   "dependencies": {
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
