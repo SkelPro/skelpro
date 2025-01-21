@@ -1,9 +1,9 @@
-import inquirer from "inquirer";
 import ora from "ora";
+import inquirer from "inquirer";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
 import type { Answers } from "./types/structures";
-import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions"
+import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
 
 interface Actions {
@@ -77,10 +77,10 @@ export default async function main() {
     },
   ]);
 
-  await setux(answers);
+  await setup(answers);
 }
 
-async function setux(answers: Answers) {
+async function setup(answers: Answers) {
   const spinner = ora("Bone by Bone, Hang on tight...\n").start();
 
   try {
