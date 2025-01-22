@@ -19,7 +19,7 @@ program
 program
   .command("generate <templateName> <projectPath>")
   .description("Generate a reusable template or should i say 'skeleton'")
-  .action((projectPath, templateName) => {
+  .action((templateName, projectPath) => {
     createTemplate(projectPath, templateName);
   });
 
