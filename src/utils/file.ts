@@ -49,17 +49,6 @@ export const ignoreFolders: string[] = [
   "*.ntvs*",
   "*.njsproj",
   "*.sln",
-  
-  /*********************************\
-   *        Miscellaneous           *
-  \*********************************/
-  ".git",
-  "*.log",
-  ".db",
-  "config.ini",
-  "downloads",
-  ".DS_Store",
-  "thumbs.db",
 
   /*********************************\
    *       Java and Maven           *
@@ -95,6 +84,17 @@ export const ignoreFolders: string[] = [
   "*.luac",
   "luarocks",
   ".luarocks",
+  
+  /*********************************\
+   *        Miscellaneous           *
+  \*********************************/
+  ".git",
+  "*.log",
+  ".db",
+  "config.ini",
+  "downloads",
+  ".DS_Store",
+  "thumbs.db",
 ];
 
 export const imgExtensions: string[] = [
