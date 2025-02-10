@@ -32,6 +32,8 @@ You will be presented with the following options:
 
 Depending on your choice, provide the required inputs when prompted.
 
+**Note:** When fetching templates from URL, fetch from URLs that returns JSON data.
+
 ## CLI command usage: 
 ```sh
 skelpro [options] [command]
