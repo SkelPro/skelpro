@@ -25,13 +25,13 @@ program
 
 
 program
-  .command("create <projectName> <templatePath>")
+  .command("create <projectName> <templatePath> <install>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
-  .action((projectName, templatePath) => {
+  .action((projectName, templatePath, install = false) => {
     if (templatePath.startsWith("http")) {
-      fetchTemplate(templatePath, projectName);
+      fetchTemplate(templatePath, projectName, install);
     } else {
-      scaffoldTemplate(templatePath, projectName)
+      scaffoldTemplate(templatePath, projectName, install)
     }
   });
 

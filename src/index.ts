@@ -75,6 +75,12 @@ export default async function main() {
       when: (answers) => answers.action === "Scaffold template" || answers.action === "Fetch and Scaffold",
       validate: (input) => input ? true : "Project name name cannot be empty",
     },
+    {
+      type: "confirm",
+      name: "install",
+      message: "Do you want to install dependencies:",
+      when: (answers) => answers.action === "Scaffold template" || answers.action === "Fetch and Scaffold",
+    },
   ]);
 
   await setup(answers);
@@ -90,11 +96,11 @@ async function setup(answers: Answers) {
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(answers.srcPath, answers.baseName);
+        scaffoldTemplate(answers.srcPath, answers.baseName, answers.install);
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(answers.url, answers.baseName);
+        fetchTemplate(answers.url, answers.baseName, answers.install);
         break;
       }
       case "Exit":

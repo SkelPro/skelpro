@@ -5,6 +5,7 @@ import { tone, toneLevel, useTimestamp } from "tonelog";
 import type { JsonStructure } from "./types/structures";
 import genJsonTemplate from "./hooks/genJsonTemplate";
 import makeStructure from "./hooks/makeStructure";
+import installDeps from "./hooks/installDeps";
 
 export async function createTemplate(srcPath: string, fileName: string) {        
   const spinner = ora("Creating template...\n").start();
@@ -17,13 +18,14 @@ export async function createTemplate(srcPath: string, fileName: string) {
   );
   console.log(
     useTimestamp(
-      toneLevel.success(`\nTemplate created and saved to ${tone.bg_green(fileName)}.skel.json`)
+      tone.success(`\nTemplate created and saved to ${tone.bg_green(fileName)}.skel.json`)
     )
   );
+
   spinner.succeed("Done.");
 }
 
-export async function scaffoldTemplate(srcPath: string, baseName: string) {
+export async function scaffoldTemplate(srcPath: string, baseName: string, install: boolean) {
   const spinner = ora("Processing...\n").start();
 
   const fileContent = fs.readFileSync(srcPath, 'utf8');
@@ -40,10 +42,15 @@ export async function scaffoldTemplate(srcPath: string, baseName: string) {
       toneLevel.success(`\nScaffolding ${tone.bg_green(baseName)} completed.`)
     )
   );
+
+  if (install) {
+    installDeps(baseName);
+  }
+
   spinner.succeed("Done.");
 }
 
-export async function fetchTemplate(url: string, baseName: string) {
+export async function fetchTemplate(url: string, baseName: string, install: boolean) {
   const spinner = ora("Fetching...\n").start();
 
   try {
@@ -70,6 +77,10 @@ export async function fetchTemplate(url: string, baseName: string) {
       console.error("Error during Fetch and Scaffold:", String(error));
     }
     throw error;
+  }
+
+  if (install) {
+    installDeps(baseName);
   }
   spinner.succeed("Done.");
 }

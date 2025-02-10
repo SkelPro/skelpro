@@ -8,4 +8,5 @@ export interface Answers {
   url: string;
   fileName: string;
   baseName: string;
+  install: boolean;
 }
