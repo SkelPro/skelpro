@@ -1,6 +1,5 @@
 import fs from "fs";
 import axios from "axios";
-import ora from "ora";
 import { tone, toneLevel, useTimestamp } from "tonelog";
 import type { JsonStructure } from "./types/structures";
 import genJsonTemplate from "./hooks/genJsonTemplate";
@@ -8,7 +7,7 @@ import makeStructure from "./hooks/makeStructure";
 import installDeps from "./hooks/installDeps";
 
 export async function createTemplate(srcPath: string, fileName: string) {        
-  const spinner = ora("Creating template...\n").start();
+  console.log("Creating template...");
 
   const folderStructure = genJsonTemplate(srcPath);
   fs.writeFileSync(
@@ -16,17 +15,17 @@ export async function createTemplate(srcPath: string, fileName: string) {
     JSON.stringify(folderStructure, null, 2),
     "utf8"
   );
+  
   console.log(
     useTimestamp(
-      tone.success(`\nTemplate created and saved to ${tone.bg_green(fileName)}.skel.json`)
+      toneLevel.success(`\nTemplate created and saved to ${fileName}.skel.json`, "done")
     )
   );
 
-  spinner.succeed("Done.");
 }
 
 export async function scaffoldTemplate(srcPath: string, baseName: string, install: boolean) {
-  const spinner = ora("Processing...\n").start();
+  console.log("Scaffolding template...");
 
   const fileContent = fs.readFileSync(srcPath, 'utf8');
   let jsonFile: JsonStructure;
@@ -37,21 +36,22 @@ export async function scaffoldTemplate(srcPath: string, baseName: string, instal
     throw new Error("Invalid file content: Unable to parse as FolderStructure.");
   }
   makeStructure(baseName, jsonFile);
+  
   console.log(
     useTimestamp(
-      toneLevel.success(`\nScaffolding ${tone.bg_green(baseName)} completed.`)
+      toneLevel.success(`Scaffolding ${baseName} completed.`, "done")
     )
   );
 
   if (install) {
-    installDeps(baseName);
+    installDeps(baseName)
+      .then(() => console.log("All dependencies installed."))
+      .catch((err) => console.error("Failed to install dependencies:", err));
   }
-
-  spinner.succeed("Done.");
 }
 
 export async function fetchTemplate(url: string, baseName: string, install: boolean) {
-  const spinner = ora("Fetching...\n").start();
+  console.log("Fetching...");
 
   try {
     const response = await axios.get(url, { timeout: 100000 });
@@ -64,10 +64,12 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
     // const urlObj = new URL(url);
     // const base = path.basename(urlObj.pathname, path.extname(urlObj.pathname));
 
+    console.log("Scaffolding template...");
     makeStructure(baseName, jsonFile); // Scaffold the project
+    
     console.log(
       useTimestamp(
-        toneLevel.success(`\n✅ Successfully scaffolded project "${tone.bg_green(baseName)}".`)
+        toneLevel.success(`\n✅ Successfully scaffolded project "${baseName}".`, "done")
       )
     );
   } catch (error) {
@@ -80,8 +82,8 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
   }
 
   if (install) {
-    installDeps(baseName);
+    installDeps(baseName)
+      .catch((err) => console.error("Failed to install dependencies:", err));
   }
-  spinner.succeed("Done.");
 }
 

@@ -1,4 +1,3 @@
-import ora from "ora";
 import inquirer from "inquirer";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
@@ -29,7 +28,7 @@ export default async function main() {
     ],
     backspace: false,
     singleLine: true,
-    seperator: " - " // Seperate title from the description
+    seperator: "-" // Seperate title from the description
   });
   
   // Prompt
@@ -87,7 +86,9 @@ export default async function main() {
 }
 
 async function setup(answers: Answers) {
-  const spinner = ora("Bone by Bone, Hang on tight...\n").start();
+  console.log(
+    tone.gray(`Bone by Bone, Hang on tight${tone.white("...")}\n`)
+  );
 
   try {
     switch (answers.action) {
@@ -104,16 +105,17 @@ async function setup(answers: Answers) {
         break;
       }
       case "Exit":
-        spinner.text = "Exit.";
+        console.log("Exit.");
         break;
       default:
         console.log("End.");
     }
-    spinner.succeed(".");
   } catch (error) {
-    spinner.fail("⚠ Something went wrong.");
+    console.log(
+      tone.error("⚠ Something went wrong.")
+    );
     console.error(error);
   } finally {
-    spinner.stop();
+    console.log(".");
   }
 }

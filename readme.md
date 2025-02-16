@@ -24,11 +24,8 @@ Don't know where to start from?, just run:
 skelpro start
 ```
 You will be presented with the following options:
+<img src="./Snapshot.PNG" />
 
-- 📁 Scaffold template - Scaffolds project skeleton JSON template
-- 📦 Create template - Generate a reusable template or should i say `skeleton`
-- 🌐 Fetch template from URL and scaffold project
-- Exit - Exit the CLI
 
 Depending on your choice, provide the required inputs when prompted.
 

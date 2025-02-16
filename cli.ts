@@ -23,11 +23,13 @@ program
     createTemplate(projectPath, templateName);
   });
 
-
 program
   .command("create <projectName> <templatePath> <install>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
-  .action((projectName, templatePath, install = false) => {
+  .option('-i, --install', 'asdasdasda asdasd')
+  .action((projectName, templatePath, opt) => {
+    const install = opt.install ? true : false;
+
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName, install);
     } else {

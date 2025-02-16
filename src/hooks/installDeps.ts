@@ -1,44 +1,55 @@
 import fs from "fs";
-import { exec } from "child_process"
+import { exec } from "child_process";
+import ora from "ora";
 
-export default function installDeps(tempDir: string) {
-  exec(`cd ${tempDir}`, (error) => {
-    if (error) {
-      console.error(error);
-    }
-  });
+export default function installDeps(tempDir: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const items = fs.readdirSync(tempDir, { withFileTypes: true });
 
-  const items = fs.readdirSync(tempDir, { withFileTypes: true });
-  
-  items.forEach((item) => { 
-    if (item.name === "packege.json") {
-      exec('npm install', (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error installing dependencies: ${error}`);
-          return;
-        }
-        console.log("Dependencies installed successfully.");
-      })
-    } 
+    items.forEach((item) => {      
+      if (item.name === "packege.json") {
+        const spinner = ora("Installing NPM dependencies...").start();
+        exec(
+          "npm install", 
+          { cwd: tempDir }, 
+          (error, stdout, stderr) => {
+            if (error) {
+              console.error(`Error installing dependencies: ${error.message}`);
+              spinner.fail("Error.");
+              spinner.stop();
+              
+              return reject(error);
+            }
+            
+            spinner.succeed("NPM dependencies installed successfully.");
+            spinner.stop();
+            resolve();
+          }
+        );
+      }
+
+      if (item.name === "requirements.txt") {
+        const spinner = ora("Installing python dependencies...").start();
+        exec(
+          "pip install -r requirements.txt", 
+          { cwd: tempDir }, 
+          (error, stdout, stderr) => {
+            if (error) {
+              console.error(`Error installing dependencies: ${error.message}`);
+              spinner.fail("Error.");
+              spinner.stop();
+              
+              return reject(error);
+            }
+
+            spinner.succeed("Python dependencies installed successfully.");
+            spinner.stop();
+            resolve();
+          }
+        );
+      }  
+    });
     
-    if (item.name === "requirements.txt") {
-      exec('pip install -r requirements.txt', (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error installing dependencies: ${error}`);
-          return;
-        }
-        console.log("Dependencies installed successfully.");
-      })
-    }
-
-    if (item.name === "Cargo.toml") {
-      exec('cargo build', (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error installing dependencies: ${error}`);
-          return;
-        }
-        console.log("Dependencies installed successfully.");
-      })
-    }
-  })
+    resolve();
+  });
 }
