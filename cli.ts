@@ -36,9 +36,6 @@ program
       scaffoldTemplate(templatePath, projectName, install)
     }
     
-    if (install) {
-      console.log("All dependencies installed");
-    }
     console.log("Done.");
   });
 
