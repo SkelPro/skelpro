@@ -23,7 +23,6 @@ export default function installDeps(tempDir: string): Promise<void> {
             
             spinner.succeed("NPM dependencies installed successfully.");
             spinner.stop();
-            resolve();
           }
         );
       }
@@ -44,7 +43,6 @@ export default function installDeps(tempDir: string): Promise<void> {
 
             spinner.succeed("Python dependencies installed successfully.");
             spinner.stop();
-            resolve();
           }
         );
       }  

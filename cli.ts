@@ -26,7 +26,7 @@ program
 program
   .command("create <projectName> <templatePath>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
-  .option('-i, --install', 'asdasdasda asdasd')
+  .option('-i, --install', 'Install dependencies flag')
   .action((projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
 
