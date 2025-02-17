@@ -24,7 +24,7 @@ program
   });
 
 program
-  .command("create <projectName> <templatePath> <install>")
+  .command("create <projectName> <templatePath>")
   .description("Scaffolds project skeleton from the specified JSON template path or URL")
   .option('-i, --install', 'asdasdasda asdasd')
   .action((projectName, templatePath, opt) => {
@@ -35,6 +35,11 @@ program
     } else {
       scaffoldTemplate(templatePath, projectName, install)
     }
+    
+    if (install) {
+      console.log("All dependencies installed");
+    }
+    console.log("Done.");
   });
 
 program.parse(process.argv);

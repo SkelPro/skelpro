@@ -14,7 +14,7 @@ export default function installDeps(tempDir: string): Promise<void> {
           { cwd: tempDir }, 
           (error, stdout, stderr) => {
             if (error) {
-              console.error(`Error installing dependencies: ${error.message}`);
+              console.error(`\nError installing dependencies: ${error.message}`);
               spinner.fail("Error.");
               spinner.stop();
               
@@ -35,7 +35,7 @@ export default function installDeps(tempDir: string): Promise<void> {
           { cwd: tempDir }, 
           (error, stdout, stderr) => {
             if (error) {
-              console.error(`Error installing dependencies: ${error.message}`);
+              console.error(`\nError installing dependencies: ${error.message}`);
               spinner.fail("Error.");
               spinner.stop();
               

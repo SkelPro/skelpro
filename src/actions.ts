@@ -1,6 +1,6 @@
 import fs from "fs";
 import axios from "axios";
-import { tone, toneLevel, useTimestamp } from "tonelog";
+import { toneLevel } from "tonelog";
 import type { JsonStructure } from "./types/structures";
 import genJsonTemplate from "./hooks/genJsonTemplate";
 import makeStructure from "./hooks/makeStructure";
@@ -17,9 +17,7 @@ export async function createTemplate(srcPath: string, fileName: string) {
   );
   
   console.log(
-    useTimestamp(
-      toneLevel.success(`\nTemplate created and saved to ${fileName}.skel.json`, "done")
-    )
+    toneLevel.success(`\nTemplate created and saved to ${fileName}.skel.json`, "done")
   );
 
 }
@@ -38,14 +36,11 @@ export async function scaffoldTemplate(srcPath: string, baseName: string, instal
   makeStructure(baseName, jsonFile);
   
   console.log(
-    useTimestamp(
-      toneLevel.success(`Scaffolding ${baseName} completed.`, "done")
-    )
+    toneLevel.success(`Scaffolding ${baseName} completed.`, "done")
   );
 
   if (install) {
     installDeps(baseName)
-      .then(() => console.log("All dependencies installed."))
       .catch((err) => console.error("Failed to install dependencies:", err));
   }
 }
@@ -68,9 +63,7 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
     makeStructure(baseName, jsonFile); // Scaffold the project
     
     console.log(
-      useTimestamp(
-        toneLevel.success(`\n✅ Successfully scaffolded project "${baseName}".`, "done")
-      )
+      toneLevel.success(`\n✅ Successfully scaffolded project "${baseName}".`, "done")
     );
   } catch (error) {
     if (error instanceof Error) {

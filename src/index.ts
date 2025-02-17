@@ -98,10 +98,22 @@ async function setup(answers: Answers) {
       }
       case "Scaffold template": {
         scaffoldTemplate(answers.srcPath, answers.baseName, answers.install);
+        console.log("");
+
+        if (answers.install) {
+          console.log("All dependencies installed");
+        }
+        console.log("Done.");
         break;
       }
       case "Fetch and Scaffold": {
         fetchTemplate(answers.url, answers.baseName, answers.install);
+        console.log("");
+
+        if (answers.install) {
+          console.log("All dependencies installed");
+        }
+        console.log("Done.");
         break;
       }
       case "Exit":
