@@ -36,7 +36,6 @@ program
       scaffoldTemplate(templatePath, projectName, install)
     }
     
-    console.log("Done.");
   });
 
 program.parse(process.argv);
