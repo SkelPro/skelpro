@@ -1,4 +1,4 @@
-# 💀 SkelPro (Skeleton Project)
+# **💀 SkelPro (Skeleton Project)**
 The spookily smart tool that breathes life into your projects!
 
 ## Introduction 📚
@@ -29,7 +29,7 @@ You will be presented with the following options:
 
 Depending on your choice, provide the required inputs when prompted.
 
-**Note:** When fetching templates from URL, fetch from URLs that returns JSON data.
+**Note:** When fetching templates from URL, fetch from URLs that returns `JSON` data upon `GET` request.
 
 ## CLI command usage: 
 ```sh
@@ -40,17 +40,24 @@ skelpro [options] [command]
 
 | Options         | Description               |
 | --------------- | ------------------------- |
-| -i, --install   | Install dependencoes      |
 | -v, --version   | Output the version number |
 | -h, --help      | Display help for command  |
+| -i, --install   | Install dependencies      |
 
 ### Commands:
 | Command                                        | Description                                                             |
 | ---------------------------------------------- | ----------------------------------------------------------------------- | 
 | start                                          | Start the command line interface 'Home'                                 | 
 | generate \<templateName> \<projectPath>     | Generate a reusable template or should i say 'skeleton'                 | 
-| scaffold \<projectName> \<templatePath>                | Scaffolds project skeleton from the specified JSON template path or URL | 
+| create \<projectName> \<templatePath>                | Scaffolds project skeleton from the specified JSON template path or URL | 
 | help [command]                                 | Display help for command                                                |  
+
+**Installing dependencies:** To install dependencies after scaffolding template simply add the `-i` or `--install` flag, as seen below:
+
+```sh
+skelpro create -i <projectName> <templatePath>
+```
+---
 
 <br />
 Why are skeletons so bad at lying?<br />
