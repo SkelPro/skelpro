@@ -40,9 +40,9 @@ skelpro [options] [command]
 
 | Options         | Description               |
 | --------------- | ------------------------- |
+| -i, --install   | Install dependencies      |
 | -v, --version   | Output the version number |
 | -h, --help      | Display help for command  |
-| -i, --install   | Install dependencies      |
 
 ### Commands:
 | Command                                        | Description                                                             |

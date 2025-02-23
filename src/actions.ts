@@ -41,6 +41,7 @@ export async function scaffoldTemplate(srcPath: string, baseName: string, instal
 
   if (install) {
     installDeps(baseName)
+      .then(() => console.log("All dependencies installed."))
       .catch((err) => console.error("Failed to install dependencies:", err));
   }
 }
@@ -76,6 +77,7 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
 
   if (install) {
     installDeps(baseName)
+      .then(() => console.log("All dependencies installed."))
       .catch((err) => console.error("Failed to install dependencies:", err));
   }
 }

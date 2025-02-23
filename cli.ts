@@ -7,7 +7,11 @@ import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
 const program = new Command();
 
-program.version(`SkelPro v${VERSION}`, "-v, --version", "Output the version number");
+program
+  .name("Skelpro")
+  .usage("[options] [command]")
+  .description("SkelPro simplifies project scaffolding by storing templates in JSON and crafting the perfect skeleton for your next big idea.")
+  .version(`v${VERSION}`, "-v, --version", "Output the version number")
 
 program
   .command("start")
