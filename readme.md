@@ -1,16 +1,15 @@
-# 💀 SkelPro (Skeleton Project)
+# **💀 SkelPro (Skeleton Project)**
 The spookily smart tool that breathes life into your projects!
 
 ## Introduction 📚
-Why waste time on bare-bones setups when you can let SkelPro assemble your project’s skeleton in seconds? This bony buddy stores your project templates in JSON tombs and raises them from the dead whenever you need a new project scaffold.
+Why waste time on bare-bones setups when you can let SkelPro assemble your project’s skeleton in seconds? This bony buddy stores your project templates in a JSON file and raises them from the dead whenever you need a new project scaffold.
 
-No more rattling around with tedious boilerplate—just flesh out your ideas while SkelPro handles the structure. It’s scary how much time you’ll save! 🦴👻"
+No more rattling around with tedious boilerplate, just flesh out your ideas while SkelPro handles the structure. It’s scary how much time you’ll save! 👻"
 
 ## Features ✨
-- Project Scaffolding: Quickly create a new project with a predefined structure.
-- Template Support: Use templates to standardize your project setup.
-- Command Line Interface: Easy-to-use CLI for project initialization.
-- JSON Storage: Stores project configurations and templates in a JSON file for easy management and retrieval.
+- **JSON Storage**: Stores project configurations and templates in a JSON file for easy management and retrieval.
+- **Project Scaffolding**: Quickly create a new project with a predefined structure.
+- **Command Line Interface**: Easy-to-use CLI for project initialization.
 
 ## Installation 💻
 You can install SkelPro via npm:
@@ -19,19 +18,18 @@ You can install SkelPro via npm:
 npm install -g skelpro
 ```
 ## Usage 🛠️
-Don't know where to start from?, just say:
+Don't know where to start from?, just run:
 
 ```bash
 skelpro start
 ```
 You will be presented with the following options:
+<img src="./Snapshot.PNG" />
 
-- 📁 Scaffold template - Scaffolds project skeleton JSON template
-- 📦 Create template - Generate a reusable template or should i say `skeleton`
-- 🌐 Fetch template from URL and scaffold project
-- Exit - Exit the CLI
 
 Depending on your choice, provide the required inputs when prompted.
+
+**Note:** When fetching templates from URL, fetch from URLs that returns `JSON` data upon `GET` request.
 
 ## CLI command usage: 
 ```sh
@@ -42,6 +40,7 @@ skelpro [options] [command]
 
 | Options         | Description               |
 | --------------- | ------------------------- |
+| -i, --install   | Install dependencies      |
 | -v, --version   | Output the version number |
 | -h, --help      | Display help for command  |
 
@@ -49,9 +48,16 @@ skelpro [options] [command]
 | Command                                        | Description                                                             |
 | ---------------------------------------------- | ----------------------------------------------------------------------- | 
 | start                                          | Start the command line interface 'Home'                                 | 
-| generate `templateName` `projectPath`     | Generate a reusable template or should i say 'skeleton'                 | 
-| scaffold `projectName` `templatePath`                | Scaffolds project skeleton from the specified JSON template path or URL | 
+| generate \<templateName> \<projectPath>     | Generate a reusable template or should i say 'skeleton'                 | 
+| create \<projectName> \<templatePath>                | Scaffolds project skeleton from the specified JSON template path or URL | 
 | help [command]                                 | Display help for command                                                |  
+
+**Installing dependencies:** To install dependencies after scaffolding template simply add the `-i` or `--install` flag, as seen below:
+
+```sh
+skelpro create -i <projectName> <templatePath>
+```
+---
 
 <br />
 Why are skeletons so bad at lying?<br />
@@ -60,13 +66,13 @@ You can see right through them! 🤷
 ## Contributing 🤝
 We welcome contributions! If you would like to contribute to SkelPro, please follow these steps:
 
-- Fork the repository.
+- Fork the repository [SkelPro](https://www.github.com/SkelPro/skelpro).
 - Create a new branch for your feature or bugfix.
 - Commit your changes.
 - Push the branch to your fork.
 - Open a pull request.
   
 ## License 📜
-This project is licensed under the Apache License 2.0. See the LICENSE file for more details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
 
 Feel free to adjust the content as needed.

@@ -1,9 +1,8 @@
 import inquirer from "inquirer";
-import ora from "ora";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
 import type { Answers } from "./types/structures";
-import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions"
+import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
 
 interface Actions {
@@ -29,7 +28,7 @@ export default async function main() {
     ],
     backspace: false,
     singleLine: true,
-    seperator: " - " // Seperate title from the description
+    seperator: "-" // Seperate title from the description
   });
   
   // Prompt
@@ -75,13 +74,21 @@ export default async function main() {
       when: (answers) => answers.action === "Scaffold template" || answers.action === "Fetch and Scaffold",
       validate: (input) => input ? true : "Project name name cannot be empty",
     },
+    {
+      type: "confirm",
+      name: "install",
+      message: "Do you want to install dependencies:",
+      when: (answers) => answers.action === "Scaffold template" || answers.action === "Fetch and Scaffold",
+    },
   ]);
 
-  await setux(answers);
+  await setup(answers);
 }
 
-async function setux(answers: Answers) {
-  const spinner = ora("Bone by Bone, Hang on tight...\n").start();
+async function setup(answers: Answers) {
+  console.log(
+    tone.gray(`Bone by Bone, Hang on tight${tone.white("...")}\n`)
+  );
 
   try {
     switch (answers.action) {
@@ -90,24 +97,27 @@ async function setux(answers: Answers) {
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(answers.srcPath, answers.baseName);
+        scaffoldTemplate(answers.srcPath, answers.baseName, answers.install);
+        console.log("");
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(answers.url, answers.baseName);
+        fetchTemplate(answers.url, answers.baseName, answers.install);
+        console.log("");
         break;
       }
       case "Exit":
-        spinner.text = "Exit.";
+        console.log("Exit.");
         break;
       default:
         console.log("End.");
     }
-    spinner.succeed(".");
   } catch (error) {
-    spinner.fail("⚠ Something went wrong.");
+    console.log(
+      tone.error("⚠ Something went wrong.")
+    );
     console.error(error);
   } finally {
-    spinner.stop();
+    console.log(".");
   }
 }
