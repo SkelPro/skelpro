@@ -5,6 +5,9 @@ import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
+// News and Updates...
+import getUpdates from "./src/hooks/getUpdates";
+
 const program = new Command();
 
 program
@@ -25,6 +28,7 @@ program
   .description("Generate a reusable template or should i say 'skeleton'")
   .action((templateName, projectPath) => {
     createTemplate(projectPath, templateName);
+    getUpdates();
   });
 
 program
@@ -40,10 +44,12 @@ program
       scaffoldTemplate(templatePath, projectName, install)
     }
     
+    getUpdates();
   });
 
 program.parse(process.argv);
 
 if (!process.argv.slice(2).length) {
   program.outputHelp();
+  getUpdates();
 }

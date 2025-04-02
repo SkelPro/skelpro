@@ -29,7 +29,13 @@ You will be presented with the following options:
 
 Depending on your choice, provide the required inputs when prompted.
 
-**Note:** When fetching templates from URL, fetch from URLs that returns `JSON` data upon `GET` request.
+<br>
+
+**⚠ Caution:** When fetching templates in **SkelPro**, ensure that the URL provided directly returns JSON data. SkelPro expects a valid JSON response, and using URLs that return other formats may cause errors or unexpected behavior. A good example of a valid URL is a **GitHub raw user content link:** 
+```
+https://raw.githubusercontent.com/<user>/<repo>/<branch>/file.json
+```
+These links serve JSON files directly without extra formatting or encoding. To avoid issues, always use a URL that returns raw JSON data.
 
 ## CLI command usage: 
 ```sh
@@ -64,13 +70,7 @@ Why are skeletons so bad at lying?<br />
 You can see right through them! 🤷
 
 ## Contributing 🤝
-We welcome contributions! If you would like to contribute to SkelPro, please follow these steps:
-
-- Fork the repository [SkelPro](https://www.github.com/SkelPro/skelpro).
-- Create a new branch for your feature or bugfix.
-- Commit your changes.
-- Push the branch to your fork.
-- Open a pull request.
+We welcome contributions! If you would like to contribute to SkelPro, see the [CONTRIBUTION](CONTRIBUTION.md) file for more info.
   
 ## License 📜
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.

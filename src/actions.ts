@@ -11,13 +11,13 @@ export async function createTemplate(srcPath: string, fileName: string) {
 
   const folderStructure = genJsonTemplate(srcPath);
   fs.writeFileSync(
-    `${fileName}.skel.json`,
+    `${fileName}.json`,
     JSON.stringify(folderStructure, null, 2),
     "utf8"
   );
   
   console.log(
-    toneLevel.success(`\nTemplate created and saved to ${fileName}.skel.json`, "done")
+    toneLevel.success(`\nTemplate created and saved to ${fileName}.json`, "done")
   );
 
 }

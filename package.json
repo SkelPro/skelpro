@@ -1,6 +1,6 @@
 {
   "name": "skelpro",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "main": "./dist/src/index.js",
   "description": "SkelPro – where projects get their bones structured.",
   "scripts": {
@@ -29,6 +29,7 @@
     "commander": "^13.0.0",
     "inquirer": "^12.3.0",
     "json5": "^2.2.3",
+    "node-fetch": "^3.3.2",
     "ora": "^5.4.1",
     "tonelog": "^2.0.7",
     "typeglide": "^1.2.3"
@@ -37,6 +38,7 @@
     "@types/express": "^5.0.0",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.10.5",
+    "@types/node-fetch": "^2.6.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }

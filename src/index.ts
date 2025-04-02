@@ -1,14 +1,12 @@
 import inquirer from "inquirer";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
-import type { Answers } from "./types/structures";
+import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
 
-interface Actions {
-  name: string;
-  value: string;
-}
+// News and Updates...
+import getUpdates from "./hooks/getUpdates";
 
 // Actions available to the user
 const choices: Actions[] = [
@@ -112,6 +110,8 @@ async function setup(answers: Answers) {
       default:
         console.log("End.");
     }
+
+    getUpdates(); // Log news and updates notifications.
   } catch (error) {
     console.log(
       tone.error("⚠ Something went wrong.")
