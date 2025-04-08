@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+
 import type { JsonStructure } from "../types/structures";
 import { getFileExtension, imgExtensions } from "../utils/file";
 

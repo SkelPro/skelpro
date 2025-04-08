@@ -1,6 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import { toneLevel } from "tonelog";
+
 import type { JsonStructure } from "./types/structures";
 import genJsonTemplate from "./hooks/genJsonTemplate";
 import makeStructure from "./hooks/makeStructure";

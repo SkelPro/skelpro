@@ -1,18 +1,18 @@
 import inquirer from "inquirer";
 import typeglide from "typeglide";
 import { tone } from "tonelog";
+
 import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
-
 // News and Updates...
 import getUpdates from "./hooks/getUpdates";
 
 // Actions available to the user
 const choices: Actions[] = [
-  { name: "📁 Scaffold template - Scaffolds project skeleton JSON template", value: "Scaffold template" },
-  { name: "📦 Create template - Generate a reusable template or should i say 'skeleton'", value: "Create template" },
-  { name: "🌐 Fetch template from URL and scaffold project", value: "Fetch and Scaffold" },
+  { name: "📁 Scaffold template - Scaffolds project skeleton (JSON template)", value: "Scaffold template" },
+  { name: "📦 Create template - Generate a reusable template", value: "Create template" },
+  { name: "🌐 Remote template - Fetch template from URL and scaffold project", value: "Fetch and Scaffold" },
   { name: "Exit", value: "Exit" },
 ];
 
@@ -26,7 +26,7 @@ export default async function main() {
     ],
     backspace: false,
     singleLine: true,
-    seperator: "-" // Seperate title from the description
+    separator: " - " // Seperate title from the description
   });
   
   // Prompt
