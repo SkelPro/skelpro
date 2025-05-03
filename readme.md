@@ -1,4 +1,3 @@
-
 # **SkelPro (Skeleton Project)**  
 A fast and simple tool to set up your project structure in seconds.
 
