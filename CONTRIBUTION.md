@@ -1,19 +1,9 @@
-<<<<<<< HEAD
-# Contributing to SkelPro 🚀
-
-Thank you for your interest in contributing to **SkelPro**! 🎉  
-SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions: fixing bugs, adding features, improving documentation, or suggesting ideas.  
-=======
-Here’s a well-structured **`CONTRIBUTING.md`** file for **SkelPro**:  
-
-```md
 # Contributing to SkelPro 🚀
 
 Thank you for your interest in contributing to **SkelPro**! 🎉  
 SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions—whether it's fixing bugs, adding features, improving documentation, or suggesting ideas.  
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 
-This guide will help you get started.  
+Here’s a well-structured **`CONTRIBUTING.md`** file for **SkelPro**:
 
 ---
 
@@ -39,10 +29,7 @@ If you spot outdated or missing information in the docs, feel free to update the
 Before contributing, ensure you have:  
 - **Node.js** (LTS recommended)  
 - **Git** installed on your machine  
-<<<<<<< HEAD
 - Good knowledge on **Typescript** & **Git**.
-=======
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 
 ### 📥 Installation  
 Clone the repository and install dependencies:  
@@ -53,8 +40,7 @@ npm install
 ```
 
 ### ▶️ Running SkelPro Locally  
-<<<<<<< HEAD
-To run skelpro locally, you need to follow these steps:
+To run SkelPro locally, follow these steps:
 
 **1.** Compile the code by running: `npm run build` or typing `tsc` in the Terminal.
 
@@ -89,29 +75,22 @@ To run skelpro locally, you need to follow these steps:
         "typescript": "^5.7.2"
     }
 }
-
 ```
-**3.** To test your changes, run:
+
+**3.** To test your changes, run:  
 ```sh
 cd package_module
 npm link
 skelpro --help
 ```
-    
+
 And that's it.
-=======
-To test your changes, run:  
-```sh
-npm link
-skelpro --help
-```
 
 ### ✅ Running Tests  
 Ensure all tests pass before submitting a PR:  
 ```sh
 npm test
 ```
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 
 ---
 
@@ -177,10 +156,7 @@ docs: Update README for clarity
 ## 📌 Pull Request Guidelines  
 Before submitting a PR:  
 - Ensure your branch is **up to date** with `main`.  
-<<<<<<< HEAD
-=======
 - Run all **tests** and fix any issues.  
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 - Provide a **clear PR description** and link related issues.  
 
 ---
@@ -193,19 +169,8 @@ If you need help:
 ---
 
 ## ⚖️ License  
-<<<<<<< HEAD
 By contributing, you agree that your code will be licensed under the **Apache License**.  
-=======
-By contributing, you agree that your code will be licensed under the **MIT License**.  
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 
 ---
 
 Thank you for helping improve SkelPro! 💙 Happy coding! 🚀
-<<<<<<< HEAD
-
-=======
-```
-
-This file is **clear, well-structured, and welcoming** while covering all key aspects of contributing to SkelPro. Let me know if you need any modifications! 😊🚀
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
