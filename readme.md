@@ -1,78 +1,72 @@
-# **💀 SkelPro (Skeleton Project)**
-The spookily smart tool that breathes life into your projects!
 
-## Introduction 📚
-Why waste time on bare-bones setups when you can let SkelPro assemble your project’s skeleton in seconds? This bony buddy stores your project templates in a JSON file and raises them from the dead whenever you need a new project scaffold.
+# **SkelPro (Skeleton Project)**  
+A fast and simple tool to set up your project structure in seconds.
 
-No more rattling around with tedious boilerplate, just flesh out your ideas while SkelPro handles the structure. It’s scary how much time you’ll save! 👻"
+## Introduction 📚  
+Tired of starting every project from scratch? SkelPro helps you set up a clean and organized project structure using pre-defined templates stored in a JSON file.  
+Whether you're starting something new or working on similar projects regularly, SkelPro saves you time and keeps your setup consistent.
 
-## Features ✨
-- **JSON Storage**: Stores project configurations and templates in a JSON file for easy management and retrieval.
-- **Project Scaffolding**: Quickly create a new project with a predefined structure.
-- **Command Line Interface**: Easy-to-use CLI for project initialization.
+## Features ✨  
+- **JSON Templates**: Easily manage your project templates with a simple JSON file.  
+- **Quick Project Setup**: Instantly scaffold a project with a predefined structure.  
+- **Command Line Interface**: Simple CLI commands to get started fast.
 
-## Installation 💻
-You can install SkelPro via npm:
+## Installation 💻  
+Install SkelPro globally via npm:
 
 ```bash
 npm install -g skelpro
 ```
-## Usage 🛠️
-Don't know where to start from?, just run:
+
+## Usage 🛠️  
+To get started, run:
 
 ```bash
 skelpro start
 ```
-You will be presented with the following options:
+
+You’ll see a set of options in the command line. Choose what you need and follow the prompts.
+
 <img src="./Snapshot.PNG" />
 
-
-Depending on your choice, provide the required inputs when prompted.
-
-<br>
-
-**⚠ Caution:** When fetching templates in **SkelPro**, ensure that the URL provided directly returns JSON data. SkelPro expects a valid JSON response, and using URLs that return other formats may cause errors or unexpected behavior. A good example of a valid URL is a **GitHub raw user content link:** 
+> **Note:** When using templates from a URL, make sure it returns raw JSON.  
+A good example is:
 ```
 https://raw.githubusercontent.com/<user>/<repo>/<branch>/file.json
 ```
-These links serve JSON files directly without extra formatting or encoding. To avoid issues, always use a URL that returns raw JSON data.
+Avoid links that return HTML or other formats — SkelPro expects proper JSON.
 
-## CLI command usage: 
-```sh
+---
+
+## CLI Command Overview  
+```bash
 skelpro [options] [command]
 ```
 
-### Options:
+### Options  
+| Option         | Description               |
+| -------------- | ------------------------- |
+| -i, --install  | Install dependencies      |
+| -v, --version  | Show version              |
+| -h, --help     | Show help                 |
 
-| Options         | Description               |
-| --------------- | ------------------------- |
-| -i, --install   | Install dependencies      |
-| -v, --version   | Output the version number |
-| -h, --help      | Display help for command  |
+### Commands  
+| Command                                         | Description                                                            |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| `start`                                        | Launches the main CLI interface                                        |
+| `generate <templateName> <projectPath>`        | Saves a new reusable project template                                  |
+| `create <projectName> <templatePath or URL>`   | Creates a project using a local or remote JSON template                |
+| `help [command]`                                | Show help for a specific command                                       |
 
-### Commands:
-| Command                                        | Description                                                             |
-| ---------------------------------------------- | ----------------------------------------------------------------------- | 
-| start                                          | Start the command line interface 'Home'                                 | 
-| generate \<templateName> \<projectPath>     | Generate a reusable template or should i say 'skeleton'                 | 
-| create \<projectName> \<templatePath>                | Scaffolds project skeleton from the specified JSON template path or URL | 
-| help [command]                                 | Display help for command                                                |  
-
-**Installing dependencies:** To install dependencies after scaffolding template simply add the `-i` or `--install` flag, as seen below:
-
-```sh
+### Example (With Dependencies Installed)  
+```bash
 skelpro create -i <projectName> <templatePath>
 ```
+
 ---
 
-<br />
-Why are skeletons so bad at lying?<br />
-You can see right through them! 🤷
+## Contributing 🤝  
+We’d love your help! To contribute, check out the [CONTRIBUTION](CONTRIBUTION.md) file for guidelines.
 
-## Contributing 🤝
-We welcome contributions! If you would like to contribute to SkelPro, see the [CONTRIBUTION](CONTRIBUTION.md) file for more info.
-  
-## License 📜
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
-
-Feel free to adjust the content as needed.
+## License 📜  
+Licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
