@@ -65,7 +65,7 @@ skelpro create -i <projectName> <templatePath>
 ---
 
 ## Contributing 🤝  
-We’d love your help! To contribute, check out the [CONTRIBUTION](CONTRIBUTION.md) file for guidelines.
+We’d love your help! To contribute, check out the [CONTRIBUTING](CONTRIBUTING.md) file for guidelines.
 
 ## License 📜  
 Licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
