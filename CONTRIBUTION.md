@@ -1,9 +1,7 @@
 # Contributing to SkelPro 🚀
-
 Thank you for your interest in contributing to **SkelPro**! 🎉  
-SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions—whether it's fixing bugs, adding features, improving documentation, or suggesting ideas.  
 
-Here’s a well-structured **`CONTRIBUTING.md`** file for **SkelPro**:
+SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions—whether it's fixing bugs, adding features, improving documentation, or suggesting ideas.  
 
 ---
 
@@ -29,7 +27,6 @@ If you spot outdated or missing information in the docs, feel free to update the
 Before contributing, ensure you have:  
 - **Node.js** (LTS recommended)  
 - **Git** installed on your machine  
-- Good knowledge on **Typescript** & **Git**.
 
 ### 📥 Installation  
 Clone the repository and install dependencies:  
@@ -77,7 +74,7 @@ To run SkelPro locally, follow these steps:
 }
 ```
 
-**3.** To test your changes, run:  
+**3.** Link sklepro locally to test your changes, run:  
 ```sh
 cd package_module
 npm link
@@ -85,12 +82,6 @@ skelpro --help
 ```
 
 And that's it.
-
-### ✅ Running Tests  
-Ensure all tests pass before submitting a PR:  
-```sh
-npm test
-```
 
 ---
 
@@ -156,7 +147,7 @@ docs: Update README for clarity
 ## 📌 Pull Request Guidelines  
 Before submitting a PR:  
 - Ensure your branch is **up to date** with `main`.  
-- Run all **tests** and fix any issues.  
+- Fix any issues.  
 - Provide a **clear PR description** and link related issues.  
 
 ---
