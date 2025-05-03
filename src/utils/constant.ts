@@ -1,2 +1,3 @@
-export const VERSION = "1.2.3";
-export const jsonNews = "https://github.com/SkelPro/skelpro";
+export const VERSION = "1.3.4";
+export const packageName = "skelpro";
+export const newsUrl = "https://raw.githubusercontent.com/SkelPro/new-updates/refs/heads/main/new-updates.json";

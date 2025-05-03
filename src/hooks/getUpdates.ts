@@ -2,14 +2,15 @@ import path from "path";
 import { execSync } from "child_process";
 import fetch from "node-fetch";
 import { readFileSync } from "fs";
-import type { NewsTypes } from "../types/structures";
-
 import { tone, toneLevel } from "tonelog";
 
-const packageName = "skelpro";
+import type { NewsTypes } from "../types/structures";
+import { packageName, newsUrl } from "../utils/constant";
 
-const newsUrl = "https://raw.githubusercontent.com/SkelPro/new-updates/refs/heads/main/new-updates.json";
+<<<<<<< HEAD
+=======
 
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 async function getInstalledVersion(): Promise<string | null> {
   try {
     const version = execSync("npm list -g skelpro --json", { encoding: "utf-8"});
@@ -70,6 +71,7 @@ async function fetchNews() {
 }
 
 export default async function getUpdates() {
+  console.log("\nChecking for updates...\nPress CTRL-C to exit.");
   await checkNewVersion();
   await fetchNews();
 }

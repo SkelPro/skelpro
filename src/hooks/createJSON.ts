@@ -4,7 +4,7 @@ import path from "path";
 import type { JsonStructure } from "../types/structures";
 import { getFileExtension, ignoreFolders, imgExtensions } from "../utils/file";
 
-export default function genJsonTemplate(dir: string): JsonStructure {
+export default function createJSON(dir: string): JsonStructure {
   let result: JsonStructure = {};
   const items = fs.readdirSync(dir, { withFileTypes: true });
   
@@ -13,7 +13,7 @@ export default function genJsonTemplate(dir: string): JsonStructure {
 
     if (!ignoreFolders.includes(item.name)) { // Skip files and folders in ignoreFolders
       if (item.isDirectory()) {
-        result[item.name] = genJsonTemplate(itemPath);
+        result[item.name] = createJSON(itemPath);
       } else {
         let ext = getFileExtension(item.name);
   

@@ -108,19 +108,3 @@ export function getFileExtension(filename: string) {
   return path.extname(filename).toLowerCase();
 }
 
-// export const sanitizeJson = (data: string): string => {
-//   return data
-//     .replace(/'/g, '"') 
-//     .replace(/,\s*}/g, '}') 
-//     .replace(/,\s*]/g, ']');
-// };
-
-export const sanitizeJson = (data: string): string => {
-  return data
-    .replace(/:\s*'([^']*)'/g, ': "$1"') // Replace single-quoted values with double quotes
-    .replace(/'([^']*)'\s*:/g, '"$1":') // Replace single-quoted keys with double quotes
-    .replace(/,\s*}/g, '}') // Remove trailing commas in objects
-    .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
-    .trim(); // Remove whitespace
-};
-
