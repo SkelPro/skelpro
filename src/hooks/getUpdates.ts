@@ -7,6 +7,10 @@ import { tone, toneLevel } from "tonelog";
 import type { NewsTypes } from "../types/structures";
 import { packageName, newsUrl } from "../utils/constant";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 async function getInstalledVersion(): Promise<string | null> {
   try {
     const version = execSync("npm list -g skelpro --json", { encoding: "utf-8"});

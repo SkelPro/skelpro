@@ -2,6 +2,7 @@ import fs from "fs";
 import { exec } from "child_process";
 import ora from "ora";
 import { promisify } from "util";
+<<<<<<< HEAD
 import { toneLevel, tone } from "tonelog";
 
 const execPromise = promisify(exec);
@@ -91,12 +92,21 @@ async function inst(
 }
 
 
+=======
+
+const execPromise = promisify(exec);
+
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 export default async function installDeps(tempDir: string): Promise<void> {
   const items = fs.readdirSync(tempDir, { withFileTypes: true });
 
   try {
     for (const item of items) {
+<<<<<<< HEAD
       if (item.name === "package-lock.json") {
+=======
+      if (item.name === "package.json") {
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
         const spinner = ora("Installing NPM dependencies...").start();
         try {
           await execPromise("npm install", { cwd: tempDir });
@@ -110,6 +120,7 @@ export default async function installDeps(tempDir: string): Promise<void> {
         }
       }
 
+<<<<<<< HEAD
       if (item.name === "yarn.lock") {
         const spinner = ora("Insalling dependencies with Yarn...").start();
         try {
@@ -124,6 +135,8 @@ export default async function installDeps(tempDir: string): Promise<void> {
         }
       }
 
+=======
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
       if (item.name === "requirements.txt") {
         const spinner = ora("Installing Python dependencies...").start();
         try {

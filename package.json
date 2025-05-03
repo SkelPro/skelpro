@@ -35,6 +35,7 @@
     "typeglide": "^1.2.4"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@jest/globals": "^29.7.0",
     "@types/express": "^5.0.0",
     "@types/inquirer": "^9.0.7",
@@ -43,6 +44,12 @@
     "@types/node-fetch": "^2.6.12",
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
+=======
+    "@types/express": "^5.0.0",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.10.5",
+    "@types/node-fetch": "^2.6.12",
+>>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
