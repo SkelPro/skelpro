@@ -1,10 +1,7 @@
-Here’s a well-structured **`CONTRIBUTING.md`** file for **SkelPro**:  
-
-```md
 # Contributing to SkelPro 🚀
 
 Thank you for your interest in contributing to **SkelPro**! 🎉  
-SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions—whether it's fixing bugs, adding features, improving documentation, or suggesting ideas.  
+SkelPro is an open-source **template scaffolding tool**, and we appreciate all contributions: fixing bugs, adding features, improving documentation, or suggesting ideas.  
 
 This guide will help you get started.  
 
@@ -32,6 +29,7 @@ If you spot outdated or missing information in the docs, feel free to update the
 Before contributing, ensure you have:  
 - **Node.js** (LTS recommended)  
 - **Git** installed on your machine  
+- Good knowledge on **Typescript** & **Git**.
 
 ### 📥 Installation  
 Clone the repository and install dependencies:  
@@ -42,17 +40,51 @@ npm install
 ```
 
 ### ▶️ Running SkelPro Locally  
-To test your changes, run:  
+To run skelpro locally, you need to follow these steps:
+
+**1.** Compile the code by running: `npm run build` or typing `tsc` in the Terminal.
+
+**2.** Create a **package.json** file for the build with the following content:
+
+```json
+{
+    "name": "skelpro",
+    "version": "1.3.4",
+    "main": "./dist/src/index.js",
+    "description": "SkelPro – where projects get their bones structured.",
+    "bin": {
+        "skelpro": "dist/cli.js"
+    },
+    "dependencies": {
+        "axios": "^1.7.9",
+        "cheerio": "^1.0.0",
+        "commander": "^13.0.0",
+        "inquirer": "^12.3.0",
+        "json5": "^2.2.3",
+        "node-fetch": "^3.3.2",
+        "ora": "^5.4.1",
+        "tonelog": "^2.0.7",
+        "typeglide": "^1.2.3"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "@types/inquirer": "^9.0.7",
+        "@types/node": "^22.10.5",
+        "@types/node-fetch": "^2.6.12",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.2"
+    }
+}
+
+```
+**3.** To test your changes, run:
 ```sh
+cd package_module
 npm link
 skelpro --help
 ```
-
-### ✅ Running Tests  
-Ensure all tests pass before submitting a PR:  
-```sh
-npm test
-```
+    
+And that's it.
 
 ---
 
@@ -118,7 +150,6 @@ docs: Update README for clarity
 ## 📌 Pull Request Guidelines  
 Before submitting a PR:  
 - Ensure your branch is **up to date** with `main`.  
-- Run all **tests** and fix any issues.  
 - Provide a **clear PR description** and link related issues.  
 
 ---
@@ -131,11 +162,8 @@ If you need help:
 ---
 
 ## ⚖️ License  
-By contributing, you agree that your code will be licensed under the **MIT License**.  
+By contributing, you agree that your code will be licensed under the **Apache License**.  
 
 ---
 
 Thank you for helping improve SkelPro! 💙 Happy coding! 🚀
-```
-
-This file is **clear, well-structured, and welcoming** while covering all key aspects of contributing to SkelPro. Let me know if you need any modifications! 😊🚀
