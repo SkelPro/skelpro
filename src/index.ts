@@ -6,7 +6,7 @@ import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
 // News and Updates...
-import getUpdates from "./hooks/getUpdates";
+import { checkNewVersion, fetchNews, logUpdates } from "./hooks/getUpdates";
 
 // Actions available to the user
 const choices: Actions[] = [
@@ -100,8 +100,13 @@ async function setup(answers: Answers) {
         break;
       }
       case "Fetch and Scaffold": {
+        const version = checkNewVersion();
+        const news = fetchNews();
+        
         fetchTemplate(answers.url, answers.baseName, answers.install);
         console.log("");
+
+        logUpdates(version, news); // Log news and updates notifications.
         break;
       }
       case "Exit":
@@ -110,8 +115,6 @@ async function setup(answers: Answers) {
       default:
         console.log("End.");
     }
-
-    getUpdates(); // Log news and updates notifications.
   } catch (error) {
     console.log(
       tone.error("⚠ Something went wrong.")

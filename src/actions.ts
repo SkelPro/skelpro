@@ -1,25 +1,17 @@
 import fs from "fs";
 import axios from "axios";
 import { toneLevel } from "tonelog";
-
 import type { JsonStructure } from "./types/structures";
-<<<<<<< HEAD
+
 import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
-=======
-import genJsonTemplate from "./hooks/genJsonTemplate";
-import makeStructure from "./hooks/makeStructure";
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 import installDeps from "./hooks/installDeps";
 
 export async function createTemplate(srcPath: string, fileName: string) {        
   console.log("Creating template...");
 
-<<<<<<< HEAD
   const folderStructure = createJSON(srcPath);
-=======
-  const folderStructure = genJsonTemplate(srcPath);
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
+
   fs.writeFileSync(
     `${fileName}.json`,
     JSON.stringify(folderStructure, null, 2),
@@ -43,11 +35,7 @@ export async function scaffoldTemplate(srcPath: string, baseName: string, instal
   } catch (parseError) {
     throw new Error("Invalid file content: Unable to parse as FolderStructure.");
   }
-<<<<<<< HEAD
   scaffoldJSON(baseName, jsonFile);
-=======
-  makeStructure(baseName, jsonFile);
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
   
   console.log(
     toneLevel.success(`Scaffolding ${baseName} completed.`, "done")
@@ -64,8 +52,8 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
   console.log("Fetching...");
 
   try {
-    const response = await axios.get(url, { timeout: 100000 });
-    const jsonFile = response.data;
+    const response = await fetch(url);
+    const jsonFile: JsonStructure = (await response.json()) as JsonStructure;
 
     // Validate JSON structure
     if (!jsonFile || typeof jsonFile !== "object") {
@@ -75,11 +63,7 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
     // const base = path.basename(urlObj.pathname, path.extname(urlObj.pathname));
 
     console.log("Scaffolding template...");
-<<<<<<< HEAD
     scaffoldJSON(baseName, jsonFile); // Scaffold the project
-=======
-    makeStructure(baseName, jsonFile); // Scaffold the project
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
     
     console.log(
       toneLevel.success(`\n✅ Successfully scaffolded project "${baseName}".`, "done")

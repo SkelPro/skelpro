@@ -44,12 +44,12 @@ cd skelpro
 
 ### 3 Create a New Branch  
 ```sh
-git checkout -b feature-name
+git checkout -b your-branch-name
 ```
 ### 4 ▶️ Running SkelPro Locally  
 To run SkelPro locally, follow these steps:
 
-- Compile the code by running: `npm run build` or typing `tsc` in the Terminal.
+- Compile the code by running: `npm run build` (recommended) or typing `tsc` in the Terminal.
 
 - Create a **package.json** file for the build with the following content:
 

@@ -7,10 +7,6 @@ import { tone, toneLevel } from "tonelog";
 import type { NewsTypes } from "../types/structures";
 import { packageName, newsUrl } from "../utils/constant";
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 async function getInstalledVersion(): Promise<string | null> {
   try {
     const version = execSync("npm list -g skelpro --json", { encoding: "utf-8"});
@@ -22,7 +18,7 @@ async function getInstalledVersion(): Promise<string | null> {
   }
 }
 
-async function checkNewVersion() {
+export async function checkNewVersion() {
   try {
     const localVersion = await getInstalledVersion();
 
@@ -34,44 +30,49 @@ async function checkNewVersion() {
     const latestVersion = data.version;
 
     if (latestVersion !== localVersion) {
-      console.log("\n");
-      
-      console.log(
-        toneLevel.info(`A new version ${latestVersion} is available!`, "update")
-      );
-
-      console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
+     return latestVersion;
     }
+
+    return 0;
   } catch (error) {
     // Silently fail (do nothing) 
     // if unable to fetch news  (e.g., offline)
   }
 }
 
-async function fetchNews() {
+export async function fetchNews() {
   try {
     const response = await fetch(newsUrl);
     const data = (await response.json()) as { news: NewsTypes[] };
 
-    if (Array.isArray(data.news)) {
-      console.log("");
-      
-      data.news.forEach((newsItem: NewsTypes) => {
-        console.log(
-          toneLevel.info(`${newsItem.title}`)
-        );
-
-        console.log(`${newsItem.message}`);
-        })
-    }
+    return data;    
   } catch (error) {
     // Silently fail (do nothing) 
     // if unable to fetch news  (e.g., offline)
   }
 }
 
-export default async function getUpdates() {
+export function logUpdates(version: number, newsData: NewsTypes) {
   console.log("\nChecking for updates...\nPress CTRL-C to exit.");
-  await checkNewVersion();
-  await fetchNews();
+  console.log("\n");
+
+  if (version > 0) {
+    console.log(
+      toneLevel.info(`A new version ${version} is available!`, "update")
+    );
+    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
+  }
+
+  if (Array.isArray(newsData.news)) {
+    console.log("");
+    
+    newsData.news.forEach((newsItem: NewsTypes) => {
+      console.log(
+        toneLevel.info(`${newsItem.title}`)
+      );
+
+      console.log(`${newsItem.message}`);
+    })
+  }  
 }
+

@@ -6,37 +6,39 @@ import main from "./src/index";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
 // News and Updates...
-import getUpdates from "./src/hooks/getUpdates";
+import { checkNewVersion, fetchNews, logUpdates } from "./src/hooks/getUpdates";
 
 const program = new Command();
 
 program
   .name("Skelpro")
   .usage("[options] [command]")
-  .description("SkelPro simplifies project scaffolding by storing templates in JSON and crafting the perfect skeleton for your next big idea.")
+  .description("A fast and simple tool to set up your project structure in seconds.")
   .version(`v${VERSION}`, "-v, --version", "Output the version number")
 
 program
-  .command("start")
-  .description("Start the command line interface 'Home'")
+  .command("launch")
+  .description("Launches the main CLI interface")
   .action(() => {
     main().catch((error) => console.error(error));
   });
 
 program
-  .command("generate <templateName> <projectPath>")
-  .description("Generate a reusable template or should i say 'skeleton'")
+  .command("save <templateName> <projectPath>")
+  .description("Saves a new reusable project template")
   .action((templateName, projectPath) => {
     createTemplate(projectPath, templateName);
-    getUpdates();
   });
 
 program
   .command("create <projectName> <templatePath>")
-  .description("Scaffolds project skeleton from the specified JSON template path or URL")
+  .description("Creates a project using a local or remote JSON template")
   .option('-i, --install', 'Install dependencies flag')
   .action((projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
+    
+    const version = checkNewVersion();
+    const news = fetchNews();
 
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName, install);
@@ -44,12 +46,26 @@ program
       scaffoldTemplate(templatePath, projectName, install)
     }
     
-    getUpdates();
+    logUpdates(version, news);
+  });
+
+// Legacy commands...
+program
+  .command("start")
+  .description("Launches the main CLI interface")
+  .action(() => {
+    main().catch((error) => console.error(error));
+  });
+
+program
+  .command("generate <templateName> <projectPath>")
+  .description("Saves a new reusable project template")
+  .action((templateName, projectPath) => {
+    createTemplate(projectPath, templateName);
   });
 
 program.parse(process.argv);
 
 if (!process.argv.slice(2).length) {
   program.outputHelp();
-  getUpdates();
 }
