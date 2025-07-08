@@ -11,8 +11,8 @@ import { logUpdates } from "./hooks/getUpdates";
 
 // Actions available to the user
 const choices: Actions[] = [
-  { name: "📁 Scaffold template - Scaffolds project skeleton (JSON template)", value: "Scaffold template" },
-  { name: "📦 Create template - Generate a reusable template", value: "Create template" },
+  { name: "📁 Create project - Scaffolds JSON template for your new project", value: "Scaffold template" },
+  { name: "📦 Save template - Saves a new reusable project template in a JSON file", value: "Create template" },
   { name: "🌐 Remote template - Fetch template from URL and scaffold project", value: "Fetch and Scaffold" },
   { name: "Exit", value: "Exit" },
 ];
