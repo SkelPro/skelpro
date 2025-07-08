@@ -2,6 +2,7 @@ import fs from "fs";
 import ora from "ora";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { tone, toneLevel } from "tonelog";
 
 const execPromise = promisify(exec);
 

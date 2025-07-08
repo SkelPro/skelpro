@@ -100,7 +100,7 @@ async function setup(answers: Answers) {
         break;
       }
       case "Fetch and Scaffold": {
-        const version = checkNewVersion();
+        const version = await checkNewVersion();
         const news = fetchNews();
         
         fetchTemplate(answers.url, answers.baseName, answers.install);

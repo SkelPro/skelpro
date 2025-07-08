@@ -1,7 +1,5 @@
-import path from "path";
 import { execSync } from "child_process";
 import fetch from "node-fetch";
-import { readFileSync } from "fs";
 import { tone, toneLevel } from "tonelog";
 
 import type { NewsTypes } from "../types/structures";
@@ -33,7 +31,7 @@ export async function checkNewVersion() {
      return latestVersion;
     }
 
-    return 0;
+    return null;
   } catch (error) {
     // Silently fail (do nothing) 
     // if unable to fetch news  (e.g., offline)
@@ -43,7 +41,7 @@ export async function checkNewVersion() {
 export async function fetchNews() {
   try {
     const response = await fetch(newsUrl);
-    const data = (await response.json()) as { news: NewsTypes[] };
+    const data = (await response.json()) as { news: NewsTypes };
 
     return data;    
   } catch (error) {
@@ -52,27 +50,27 @@ export async function fetchNews() {
   }
 }
 
-export function logUpdates(version: number, newsData: NewsTypes) {
-  console.log("\nChecking for updates...\nPress CTRL-C to exit.");
-  console.log("\n");
-
-  if (version > 0) {
-    console.log(
-      toneLevel.info(`A new version ${version} is available!`, "update")
-    );
-    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
-  }
-
-  if (Array.isArray(newsData.news)) {
+export function logUpdates(
+  version: string | null | undefined, 
+  newsData: Promise<{ news: NewsTypes; } | undefined>
+) {
+  if (Array.isArray(newsData)) {
     console.log("");
     
-    newsData.news.forEach((newsItem: NewsTypes) => {
+    newsData.forEach((newsItem: NewsTypes) => {
       console.log(
         toneLevel.info(`${newsItem.title}`)
       );
 
       console.log(`${newsItem.message}`);
     })
-  }  
-}
+  }
 
+  // Log version update message
+  if (version) {
+    console.log(
+      toneLevel.info(`A new version ${version} is available!`, "update")
+    );
+    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
+  }
+}

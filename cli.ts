@@ -34,19 +34,18 @@ program
   .command("create <projectName> <templatePath>")
   .description("Creates a project using a local or remote JSON template")
   .option('-i, --install', 'Install dependencies flag')
-  .action((projectName, templatePath, opt) => {
+  .action(async (projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
     
-    const version = checkNewVersion();
+    const version = await checkNewVersion();
     const news = fetchNews();
 
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName, install);
+      logUpdates(version, news);
     } else {
       scaffoldTemplate(templatePath, projectName, install)
     }
-    
-    logUpdates(version, news);
   });
 
 // Legacy commands...
