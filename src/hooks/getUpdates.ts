@@ -16,22 +16,14 @@ async function getInstalledVersion(): Promise<string | null> {
   }
 }
 
-export async function checkNewVersion() {
+export async function checkNewVersion(): Promise<string | undefined> {
   try {
-    const localVersion = await getInstalledVersion();
-
-    if (!localVersion) return;
-
     // Fetch latest version
     const response = await fetch("https://registry.npmjs.org/skelpro/latest");
     const data = (await response.json()) as { version: string };
     const latestVersion = data.version;
 
-    if (latestVersion !== localVersion) {
-     return latestVersion;
-    }
-
-    return null;
+    return latestVersion;
   } catch (error) {
     // Silently fail (do nothing) 
     // if unable to fetch news  (e.g., offline)
@@ -50,10 +42,18 @@ export async function fetchNews() {
   }
 }
 
-export function logUpdates(
-  version: string | null | undefined, 
-  newsData: Promise<{ news: NewsTypes; } | undefined>
-) {
+export async function logUpdates() { // logUpdates function will only be called when fetching a remote template.
+  const newsData = await fetchNews();
+  const localVersion = await getInstalledVersion();
+  const latestVersion = await checkNewVersion();
+
+  if (localVersion !== latestVersion) {
+    console.log(
+      toneLevel.info(`A new version ${latestVersion} is available!`, "update")
+    );
+    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
+  }
+
   if (Array.isArray(newsData)) {
     console.log("");
     
@@ -64,13 +64,5 @@ export function logUpdates(
 
       console.log(`${newsItem.message}`);
     })
-  }
-
-  // Log version update message
-  if (version) {
-    console.log(
-      toneLevel.info(`A new version ${version} is available!`, "update")
-    );
-    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
   }
 }

@@ -6,7 +6,7 @@ import main from "./src/index";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
 // News and Updates...
-import { checkNewVersion, fetchNews, logUpdates } from "./src/hooks/getUpdates";
+import { logUpdates } from "./src/hooks/getUpdates";
 
 const program = new Command();
 
@@ -36,13 +36,10 @@ program
   .option('-i, --install', 'Install dependencies flag')
   .action(async (projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
-    
-    const version = await checkNewVersion();
-    const news = fetchNews();
 
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName, install);
-      logUpdates(version, news);
+      logUpdates(); 
     } else {
       scaffoldTemplate(templatePath, projectName, install)
     }

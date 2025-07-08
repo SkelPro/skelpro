@@ -5,8 +5,9 @@ import { tone } from "tonelog";
 import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import asciiArt from "./utils/asciiArt";
+
 // News and Updates...
-import { checkNewVersion, fetchNews, logUpdates } from "./hooks/getUpdates";
+import { logUpdates } from "./hooks/getUpdates";
 
 // Actions available to the user
 const choices: Actions[] = [
@@ -99,14 +100,11 @@ async function setup(answers: Answers) {
         console.log("");
         break;
       }
-      case "Fetch and Scaffold": {
-        const version = await checkNewVersion();
-        const news = fetchNews();
-        
+      case "Fetch and Scaffold": {        
         fetchTemplate(answers.url, answers.baseName, answers.install);
         console.log("");
 
-        logUpdates(version, news); // Log news and updates notifications.
+        logUpdates(); 
         break;
       }
       case "Exit":
