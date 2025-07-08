@@ -66,3 +66,5 @@ export async function logUpdates() { // logUpdates function will only be called 
     })
   }
 }
+
+
