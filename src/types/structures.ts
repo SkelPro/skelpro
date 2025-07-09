@@ -1,6 +1,6 @@
 export type JsonStructure = {
-  [key: string]: Object | string
-}
+  [key: string]: Object | string;
+};
 
 export interface Actions {
   name: string;
@@ -18,6 +18,5 @@ export interface Answers {
 
 export interface NewsTypes {
   title: string;
-  message: string
+  message: string;
 }
-

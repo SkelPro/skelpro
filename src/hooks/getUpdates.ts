@@ -7,7 +7,9 @@ import { packageName, newsUrl } from "../utils/constant";
 
 async function getInstalledVersion(): Promise<string | null> {
   try {
-    const version = execSync("npm list -g skelpro --json", { encoding: "utf-8"});
+    const version = execSync("npm list -g skelpro --json", {
+      encoding: "utf-8",
+    });
     const parsed = JSON.parse(version);
 
     return parsed.dependencies?.[packageName]?.version || null;
@@ -25,7 +27,7 @@ export async function checkNewVersion(): Promise<string | undefined> {
 
     return latestVersion;
   } catch (error) {
-    // Silently fail (do nothing) 
+    // Silently fail (do nothing)
     // if unable to fetch news  (e.g., offline)
   }
 }
@@ -35,14 +37,15 @@ export async function fetchNews() {
     const response = await fetch(newsUrl);
     const data = (await response.json()) as { news: NewsTypes };
 
-    return data;    
+    return data;
   } catch (error) {
-    // Silently fail (do nothing) 
+    // Silently fail (do nothing)
     // if unable to fetch news  (e.g., offline)
   }
 }
 
-export async function logUpdates() { // logUpdates function will only be called when fetching a remote template.
+export async function logUpdates() {
+  // logUpdates function will only be called when fetching a remote template.
   const newsData = await fetchNews();
   const localVersion = await getInstalledVersion();
   const latestVersion = await checkNewVersion();
@@ -51,20 +54,18 @@ export async function logUpdates() { // logUpdates function will only be called 
     console.log(
       toneLevel.info(`A new version ${latestVersion} is available!`, "update")
     );
-    console.log(`Run: ${tone.green("npm update -g skelpro")} to get latest version.`);
+    console.log(
+      `Run: ${tone.green("npm update -g skelpro")} to get latest version.`
+    );
   }
 
   if (Array.isArray(newsData)) {
     console.log("");
-    
+
     newsData.forEach((newsItem: NewsTypes) => {
-      console.log(
-        toneLevel.info(`${newsItem.title}`)
-      );
+      console.log(toneLevel.info(`${newsItem.title}`));
 
       console.log(`${newsItem.message}`);
-    })
+    });
   }
 }
-
-

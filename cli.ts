@@ -13,8 +13,10 @@ const program = new Command();
 program
   .name("Skelpro")
   .usage("[options] [command]")
-  .description("A fast and simple tool to set up your project structure in seconds.")
-  .version(`v${VERSION}`, "-v, --version", "Output the version number")
+  .description(
+    "A fast and simple tool to set up your project structure in seconds."
+  )
+  .version(`v${VERSION}`, "-v, --version", "Output the version number");
 
 program
   .command("launch")
@@ -33,15 +35,15 @@ program
 program
   .command("create <projectName> <templatePath>")
   .description("Creates a project using a local or remote JSON template")
-  .option('-i, --install', 'Install dependencies flag')
+  .option("-i, --install", "Install dependencies flag")
   .action(async (projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
 
     if (templatePath.startsWith("http")) {
       fetchTemplate(templatePath, projectName, install);
-      logUpdates(); 
+      logUpdates();
     } else {
-      scaffoldTemplate(templatePath, projectName, install)
+      scaffoldTemplate(templatePath, projectName, install);
     }
   });
 

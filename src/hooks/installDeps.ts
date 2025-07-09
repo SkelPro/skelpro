@@ -31,9 +31,11 @@ export default async function installDeps(tempDir: string): Promise<void> {
           await execPromise("yarn add", { cwd: tempDir });
           spinner.succeed("Dependencies installed successfully.");
         } catch (error) {
-          spinner.fail(toneLevel.error(tone.white(`\nError installing dependencies...`)))
+          spinner.fail(
+            toneLevel.error(tone.white(`\nError installing dependencies...`))
+          );
           console.error(`\nError: ${(error as Error).message}`);
-          throw error
+          throw error;
         } finally {
           spinner.stop();
         }
@@ -46,19 +48,15 @@ export default async function installDeps(tempDir: string): Promise<void> {
 
           // we activate the virtual environment based on the OS
           if (process.platform === "win32") {
-            await execPromise(
-              ".\\venv\\Scripts\\activate", 
-              { cwd: tempDir }
-            );
+            await execPromise(".\\venv\\Scripts\\activate", { cwd: tempDir });
           } else {
-            await execPromise(
-              "source venv/bin/activate", 
-              { cwd: tempDir }
-            );
+            await execPromise("source venv/bin/activate", { cwd: tempDir });
           }
 
-          await execPromise("pip install -r requirements.txt", { cwd: tempDir });
-          
+          await execPromise("pip install -r requirements.txt", {
+            cwd: tempDir,
+          });
+
           spinner.succeed("Python dependencies installed successfully.");
         } catch (error) {
           spinner.fail("Error installing Python dependencies.");
@@ -73,4 +71,3 @@ export default async function installDeps(tempDir: string): Promise<void> {
     throw error;
   }
 }
-

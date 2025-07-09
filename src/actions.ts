@@ -6,7 +6,7 @@ import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
 import installDeps from "./hooks/installDeps";
 
-export async function createTemplate(srcPath: string, fileName: string) {        
+export async function createTemplate(srcPath: string, fileName: string) {
   console.log("Creating template...");
 
   const folderStructure = createJSON(srcPath);
@@ -16,29 +16,35 @@ export async function createTemplate(srcPath: string, fileName: string) {
     JSON.stringify(folderStructure, null, 2),
     "utf8"
   );
-  
-  console.log(
-    toneLevel.success(`\nTemplate created and saved to ${fileName}.json`, "done")
-  );
 
+  console.log(
+    toneLevel.success(
+      `\nTemplate created and saved to ${fileName}.json`,
+      "done"
+    )
+  );
 }
 
-export async function scaffoldTemplate(srcPath: string, baseName: string, install: boolean) {
+export async function scaffoldTemplate(
+  srcPath: string,
+  baseName: string,
+  install: boolean
+) {
   console.log("Scaffolding template...");
 
-  const fileContent = fs.readFileSync(srcPath, 'utf8');
+  const fileContent = fs.readFileSync(srcPath, "utf8");
   let jsonFile: JsonStructure;
-  
+
   try {
     jsonFile = JSON.parse(fileContent);
   } catch (parseError) {
-    throw new Error("Invalid file content: Unable to parse as FolderStructure.");
+    throw new Error(
+      "Invalid file content: Unable to parse as FolderStructure."
+    );
   }
   scaffoldJSON(baseName, jsonFile);
-  
-  console.log(
-    toneLevel.success(`Scaffolding ${baseName} completed.`, "done")
-  );
+
+  console.log(toneLevel.success(`Scaffolding ${baseName} completed.`, "done"));
 
   if (install) {
     installDeps(baseName)
@@ -47,7 +53,11 @@ export async function scaffoldTemplate(srcPath: string, baseName: string, instal
   }
 }
 
-export async function fetchTemplate(url: string, baseName: string, install: boolean) {
+export async function fetchTemplate(
+  url: string,
+  baseName: string,
+  install: boolean
+) {
   console.log("Fetching...");
 
   try {
@@ -63,9 +73,12 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
 
     console.log("Scaffolding template...");
     scaffoldJSON(baseName, jsonFile); // Scaffold the project
-    
+
     console.log(
-      toneLevel.success(`\n✅ Successfully scaffolded project "${baseName}".`, "done")
+      toneLevel.success(
+        `\n✅ Successfully scaffolded project "${baseName}".`,
+        "done"
+      )
     );
   } catch (error) {
     if (error instanceof Error) {
@@ -82,4 +95,3 @@ export async function fetchTemplate(url: string, baseName: string, install: bool
       .catch((err) => console.error("Failed to install dependencies:", err));
   }
 }
-
