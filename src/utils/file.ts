@@ -84,7 +84,7 @@ export const ignoreFolders: string[] = [
   "*.luac",
   "luarocks",
   ".luarocks",
-  
+
   /*********************************\
    *        Miscellaneous           *
   \*********************************/
@@ -97,14 +97,8 @@ export const ignoreFolders: string[] = [
   "thumbs.db",
 ];
 
-export const imgExtensions: string[] = [
-  ".jpeg",
-  ".jpg",
-  ".png",
-  ".PNG"
-];
+export const imgExtensions: string[] = [".jpeg", ".jpg", ".png", ".PNG"];
 
 export function getFileExtension(filename: string) {
   return path.extname(filename).toLowerCase();
 }
-

@@ -4,7 +4,10 @@ import path from "path";
 import type { JsonStructure } from "../types/structures";
 import { getFileExtension, imgExtensions } from "../utils/file";
 
-export default function scaffoldJSON( dir: string, structure: JsonStructure ): void {
+export default function scaffoldJSON(
+  dir: string,
+  structure: JsonStructure
+): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }

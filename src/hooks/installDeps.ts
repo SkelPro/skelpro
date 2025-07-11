@@ -1,112 +1,17 @@
 import fs from "fs";
-import { exec } from "child_process";
 import ora from "ora";
+import { exec } from "child_process";
 import { promisify } from "util";
-<<<<<<< HEAD
-import { toneLevel, tone } from "tonelog";
+import { tone, toneLevel } from "tonelog";
 
 const execPromise = promisify(exec);
 
-interface OSCommand {
-  osType: "win32" | "darwin";
-  comma: string;
-}
-
-interface Command {
-  osRequired: boolean;
-  command?: string;
-  osCommand?: OSCommand[];
-}
-
-
-
-const npmCommands = [
-  {
-    command1: "",
-    osrequired: false
-  },
-  {
-    osRequired: true,
-    commands: [
-      {
-        type: "win32",
-        command: "vla"
-      }
-    ]
-  }
-]
-
-
-// async function install(
-//   tempDir: string, 
-//   lockFile: string,
-//   installTree: Command[]
-// ) {
-//   const items = fs.readdirSync(tempDir, { withFileTypes: true });
-
-//   try {
-//     for (const item of items) {
-//       const spinner = ora("Installing NPM dependencies...").start();
-//       for (const command of installTree) {
-//         try {
-//           if (command.osRequired) {
-//             if (process.platform === "win32") {
-//               await execPromise(
-//                 ".\\venv\\Scripts\\activate", 
-//                 { cwd: tempDir }
-//               );
-//             } else {
-//               await execPromise(
-//                 "source venv/bin/activate", 
-//                 { cwd: tempDir }
-//               );
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-
-async function inst(
-  tempDir: string,
-  lockFile: string,
-  installTree: Command[]
-) {
-  const items = fs.readdirSync(tempDir, { withFileTypes: true });
-
-  try {
-    for (const item of items) {
-      const spinner = ora("Installing Dependencies...").start();
-      for (const comm of installTree) {
-        try {
-          if (comm.osRequired) {
-            if (process.platform === "win32" && comm.osCommand) {
-              // await execPromise(comm.osCommand.os)
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-
-=======
-
-const execPromise = promisify(exec);
-
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
 export default async function installDeps(tempDir: string): Promise<void> {
   const items = fs.readdirSync(tempDir, { withFileTypes: true });
 
   try {
     for (const item of items) {
-<<<<<<< HEAD
       if (item.name === "package-lock.json") {
-=======
-      if (item.name === "package.json") {
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
         const spinner = ora("Installing NPM dependencies...").start();
         try {
           await execPromise("npm install", { cwd: tempDir });
@@ -120,23 +25,22 @@ export default async function installDeps(tempDir: string): Promise<void> {
         }
       }
 
-<<<<<<< HEAD
       if (item.name === "yarn.lock") {
         const spinner = ora("Insalling dependencies with Yarn...").start();
         try {
           await execPromise("yarn add", { cwd: tempDir });
           spinner.succeed("Dependencies installed successfully.");
         } catch (error) {
-          spinner.fail(toneLevel.error(tone.white(`\nError installing dependencies...`)))
+          spinner.fail(
+            toneLevel.error(tone.white(`\nError installing dependencies...`))
+          );
           console.error(`\nError: ${(error as Error).message}`);
-          throw error
+          throw error;
         } finally {
           spinner.stop();
         }
       }
 
-=======
->>>>>>> 29fbee78b94a8a10fe58d89f03b05d58bf68a69b
       if (item.name === "requirements.txt") {
         const spinner = ora("Installing Python dependencies...").start();
         try {
@@ -144,19 +48,15 @@ export default async function installDeps(tempDir: string): Promise<void> {
 
           // we activate the virtual environment based on the OS
           if (process.platform === "win32") {
-            await execPromise(
-              ".\\venv\\Scripts\\activate", 
-              { cwd: tempDir }
-            );
+            await execPromise(".\\venv\\Scripts\\activate", { cwd: tempDir });
           } else {
-            await execPromise(
-              "source venv/bin/activate", 
-              { cwd: tempDir }
-            );
+            await execPromise("source venv/bin/activate", { cwd: tempDir });
           }
 
-          await execPromise("pip install -r requirements.txt", { cwd: tempDir });
-          
+          await execPromise("pip install -r requirements.txt", {
+            cwd: tempDir,
+          });
+
           spinner.succeed("Python dependencies installed successfully.");
         } catch (error) {
           spinner.fail("Error installing Python dependencies.");
@@ -171,4 +71,3 @@ export default async function installDeps(tempDir: string): Promise<void> {
     throw error;
   }
 }
-
