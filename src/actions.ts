@@ -58,7 +58,7 @@ export async function fetchTemplate(
   baseName: string,
   install: boolean
 ) {
-  console.log("Fetching...");
+  console.log("Fetching template skeleton...");
 
   try {
     const response = await fetch(url);
@@ -68,8 +68,6 @@ export async function fetchTemplate(
     if (!jsonFile || typeof jsonFile !== "object") {
       throw new Error("Invalid JSON structure or empty response.");
     }
-    // const urlObj = new URL(url);
-    // const base = path.basename(urlObj.pathname, path.extname(urlObj.pathname));
 
     console.log("Scaffolding template...");
     scaffoldJSON(baseName, jsonFile); // Scaffold the project

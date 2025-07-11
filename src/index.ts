@@ -4,7 +4,7 @@ import { tone } from "tonelog";
 
 import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
-import asciiArt from "./utils/asciiArt";
+import { ASCII_ART } from "./utils/constant";
 
 // News and Updates...
 import { logUpdates } from "./hooks/getUpdates";
@@ -27,7 +27,7 @@ const choices: Actions[] = [
 ];
 
 export default async function main() {
-  console.log(`${asciiArt}`);
+  console.log(`${ASCII_ART}`);
 
   await typeglide({
     strings: [

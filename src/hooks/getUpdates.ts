@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import { tone, toneLevel } from "tonelog";
 
 import type { NewsTypes } from "../types/structures";
-import { packageName, newsUrl } from "../utils/constant";
+import { PACKAGE_NAME, NEWS_URL } from "../utils/constant";
 
 async function getInstalledVersion(): Promise<string | null> {
   try {
@@ -12,7 +12,7 @@ async function getInstalledVersion(): Promise<string | null> {
     });
     const parsed = JSON.parse(version);
 
-    return parsed.dependencies?.[packageName]?.version || null;
+    return parsed.dependencies?.[PACKAGE_NAME]?.version || null;
   } catch {
     return null; // Silently fail
   }
@@ -34,7 +34,7 @@ export async function checkNewVersion(): Promise<string | undefined> {
 
 export async function fetchNews() {
   try {
-    const response = await fetch(newsUrl);
+    const response = await fetch(NEWS_URL);
     const data = (await response.json()) as { news: NewsTypes };
 
     return data;
