@@ -7,7 +7,7 @@ import { PACKAGE_NAME, NEWS_URL } from "../utils/constant";
 
 async function getInstalledVersion(): Promise<string | null> {
   try {
-    const version = execSync("npm list -g skelpro --json", {
+    const version = execSync(`npm list -g ${PACKAGE_NAME} --json`, {
       encoding: "utf-8",
     });
     const parsed = JSON.parse(version);
@@ -21,7 +21,8 @@ async function getInstalledVersion(): Promise<string | null> {
 export async function checkNewVersion(): Promise<string | undefined> {
   try {
     // Fetch latest version
-    const response = await fetch("https://registry.npmjs.org/skelpro/latest");
+    const packagePath = encodeURIComponent(PACKAGE_NAME);
+    const response = await fetch(`https://registry.npmjs.org/${packagePath}/latest`);
     const data = (await response.json()) as { version: string };
     const latestVersion = data.version;
 
@@ -55,7 +56,7 @@ export async function logUpdates() {
       toneLevel.info(`A new version ${latestVersion} is available!`, "update")
     );
     console.log(
-      `Run: ${tone.green("npm update -g skelpro")} to get latest version.`
+      `Run: ${tone.green(`npm update -g ${PACKAGE_NAME}`)} to get latest version.`
     );
   }
 

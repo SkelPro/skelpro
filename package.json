@@ -1,5 +1,5 @@
 {
-  "name": "skelpro",
+  "name": "@skelpro/skelpro",
   "version": "1.4.1",
   "main": "./dist/src/index.js",
   "description": "SkelPro – where projects get their bones structured.",
@@ -17,7 +17,10 @@
   "license": "Apache",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SkelPro/skelpro.git"
+    "url": "https://github.com/SkelPro/skelpro.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "bugs": {
     "url": "https://github.com/SkelPro/skelpro/issues"
