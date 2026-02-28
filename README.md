@@ -18,7 +18,7 @@ Whether you're starting something new or working on similar projects regularly, 
 Install **SkelPro** globally via npm:
 
 ```bash
-npm install -g skelpro
+npm install -g @skelpro/skelpro
 ```
 
 ## Usage 🛠️  
@@ -64,6 +64,35 @@ The below are the CLI commands SkelPro supports and their usage.
 | `create <projectName> <templatePath (or) URL>`   | Creates a project using a local or remote JSON template                |
 | `help [command]`                                | Show help for a specific command                                       |
 
+
+
+## Publishing Under the Organization ✅
+If you are publishing from this repository and want the package to be owned by the **SkelPro** organization, use this checklist:
+
+1. Use an org-scoped package name in `package.json`:
+   - `@skelpro/skelpro`
+2. Ensure the `repository.url` points to this repository:
+   - `https://github.com/SkelPro/skelpro.git`
+3. Verify package visibility from the organization profile:
+   - GitHub → **SkelPro** → **Packages**
+4. Confirm organization package permissions:
+   - Organization Settings → **Packages** → **Permissions**
+
+> Most package-linking issues come from publishing with the wrong scope (for example, personal scope instead of org scope).
+
+## AI Era Roadmap for SkelPro 🤖
+SkelPro is already useful as a scaffolding CLI. To make it highly relevant in an AI-first workflow, focus on these upgrades:
+
+- **Prompt-to-template generation**
+  - Example: “Create a Node.js + TypeScript + Docker API starter” and generate a valid SkelPro JSON template automatically.
+- **Best-practice template suggestions**
+  - Recommend CI/CD, linting, tests, and folder conventions based on project type.
+- **Auto-generated docs**
+  - Create README files, setup instructions, and usage guides directly from template metadata.
+- **Assistant actions on existing projects**
+  - Add features like “insert auth boilerplate” or “add GitHub Actions workflow” through guided commands.
+
+These changes evolve SkelPro from a template runner into an AI-assisted project architect.
 
 ## Contributing 🤝  
 We’d love your help! To contribute, check out the [CONTRIBUTING](CONTRIBUTING.md) file for guidelines.
