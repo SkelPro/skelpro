@@ -15,7 +15,7 @@ async function createTemplate(srcPath: string, fileName: string) {
     `${fileName}.json`,
     JSON.stringify(folderStructure, null, 2),
     "utf8"
-  );
+  ); 
 
   console.log(
     toneLevel.success(
