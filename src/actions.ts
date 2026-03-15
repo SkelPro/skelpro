@@ -6,7 +6,7 @@ import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
 import installDeps from "./hooks/installDeps";
 
-export async function createTemplate(srcPath: string, fileName: string) {
+async function createTemplate(srcPath: string, fileName: string) {
   console.log("Creating template...");
 
   const folderStructure = createJSON(srcPath);
@@ -15,17 +15,18 @@ export async function createTemplate(srcPath: string, fileName: string) {
     `${fileName}.json`,
     JSON.stringify(folderStructure, null, 2),
     "utf8"
-  );
+  ); 
 
   console.log(
     toneLevel.success(
-      `\nTemplate created and saved to ${fileName}.json`,
+      `Template created and saved to ${fileName}.json`,
       "done"
     )
   );
 }
 
-export async function scaffoldTemplate(
+
+async function scaffoldTemplate(
   srcPath: string,
   baseName: string,
   install: boolean
@@ -53,9 +54,9 @@ export async function scaffoldTemplate(
   }
 }
 
-export async function fetchTemplate(
-  url: string,
-  baseName: string,
+async function fetchTemplate(
+  url: string, 
+  baseName: string, 
   install: boolean
 ) {
   console.log("Fetching template skeleton...");
@@ -74,7 +75,7 @@ export async function fetchTemplate(
 
     console.log(
       toneLevel.success(
-        `\n✅ Successfully scaffolded project "${baseName}".`,
+        `Successfully scaffolded project: "${baseName}".`,
         "done"
       )
     );
@@ -93,3 +94,5 @@ export async function fetchTemplate(
       .catch((err) => console.error("Failed to install dependencies:", err));
   }
 }
+
+export { createTemplate, fetchTemplate, scaffoldTemplate };

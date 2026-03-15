@@ -1,6 +1,6 @@
 {
   "name": "skelpro",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "main": "./dist/src/index.js",
   "description": "SkelPro – where projects get their bones structured.",
   "scripts": {
@@ -8,11 +8,20 @@
     "start": "npx ts-node src/index.ts"
   },
   "keywords": [
+    "cli",
+    "scaffolding",
+    "boilerplate",
+    "automation",
+    "developer-tool",
+    "generator",
+    "project",
     "setup",
-    "Project setup",
-    "Template",
-    "Template scaffolding",
-    "Skeleton project"
+    "project",
+    "templating",
+    "template",
+    "scalfold",
+    "skeleton",
+    "structure"
   ],
   "license": "Apache",
   "repository": {

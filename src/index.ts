@@ -9,7 +9,7 @@ import { ASCII_ART } from "./utils/constant";
 // News and Updates...
 import { logUpdates } from "./hooks/getUpdates";
 
-// Actions available to the user
+// Actions available to the developer
 const choices: Actions[] = [
   {
     name: "📁 Create project - Scaffolds JSON template for your new project",
@@ -29,11 +29,13 @@ const choices: Actions[] = [
 export default async function main() {
   console.log(`${ASCII_ART}`);
 
+  // Simulate a typing effect
   await typeglide({
     strings: [
       tone.bright_cyan("\n 💀 SkelPro"),
       tone.white(
-        `The spookily smart tool that breathes life into your projects!\n`
+
+        `Where projects get their bones structured!\n`
       ),
     ],
     backspace: false,
@@ -96,9 +98,10 @@ export default async function main() {
     },
   ]);
 
-  await setup(answers);
+  await setup(answers); // Carryout the selected action
 }
 
+// Defined the setup function
 async function setup(answers: Answers) {
   console.log(tone.gray(`Bone by Bone, Hang on tight${tone.white("...")}\n`));
 

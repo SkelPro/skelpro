@@ -4,24 +4,20 @@ SkelPro is a fast and simple CLI tool for creating and setting up a project stru
 
 Whether you're starting something new or working on similar projects regularly, SkelPro saves you time and keeps your setup consistent.
 
-
-<!-- ## Introduction 📚   -->
-
-
-## Features ✨  
+## Features 
 - **JSON Templates:** Easily manage your project templates with a simple JSON file.  
 - **Quick Setup:** Instantly scaffold a project with a predefined structure.  
 - **Simple CLI:** Clean interface and simple CLI commands to get started fast.
 - **Transparency:** Clearly see what's in the template.
 
-## Installation 💻  
+## Installation 
 Install **SkelPro** globally via npm:
 
 ```bash
 npm install -g skelpro
 ```
 
-## Usage 🛠️  
+## Usage 
 To launch SkelPro's interface - run:
 
 ```bash
@@ -64,10 +60,10 @@ The below are the CLI commands SkelPro supports and their usage.
 | `create <projectName> <templatePath (or) URL>`   | Creates a project using a local or remote JSON template                |
 | `help [command]`                                | Show help for a specific command                                       |
 
+## Contributing 
+**Have any features you wish to add or you found a typo and would like to improve this documentation?...** Check out the [CONTRIBUTING](CONTRIBUTING.md) file for guidelines, we'd be glad to have you help out. We are also planning on integrating AI for this beautiful tool.
 
-## Contributing 🤝  
-We’d love your help! To contribute, check out the [CONTRIBUTING](CONTRIBUTING.md) file for guidelines.
+Feel free to create [issues](https://github.com/SkelPro/skelpro/issues) or provide feedbacks!.
 
-## License 📜  
+## License 
 Licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
-

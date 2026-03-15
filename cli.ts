@@ -16,7 +16,7 @@ program
   .description(
     "A fast and simple tool to set up your project structure in seconds."
   )
-  .version(`v${VERSION}`, "-v, --version", "Output the version number");
+  .version(`Version ${VERSION}`, "-v, --version", "Output the version number");
 
 program
   .command("launch")
@@ -45,21 +45,6 @@ program
     } else {
       scaffoldTemplate(templatePath, projectName, install);
     }
-  });
-
-// Legacy commands...
-program
-  .command("start")
-  .description("Launches the main CLI interface")
-  .action(() => {
-    main().catch((error) => console.error(error));
-  });
-
-program
-  .command("generate <templateName> <projectPath>")
-  .description("Saves a new reusable project template")
-  .action((templateName, projectPath) => {
-    createTemplate(projectPath, templateName);
   });
 
 program.parse(process.argv);

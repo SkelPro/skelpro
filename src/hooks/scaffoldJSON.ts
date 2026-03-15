@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import type { JsonStructure } from "../types/structures";
-import { getFileExtension, imgExtensions } from "../utils/file";
+import { getFileExtension, imgExtensions } from "../utils/files";
 
 export default function scaffoldJSON(
   dir: string,
@@ -23,7 +23,6 @@ export default function scaffoldJSON(
       }
 
       if (imgExtensions.includes(getFileExtension(key))) {
-        // Encode image files in base64
         fs.writeFileSync(fullPath, Buffer.from(value.split(",")[1], "base64"));
       } else {
         fs.writeFileSync(fullPath, value, "utf8");
