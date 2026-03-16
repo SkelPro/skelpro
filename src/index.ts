@@ -7,7 +7,7 @@ import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import { ASCII_ART } from "./utils/constant";
 
 // News and Updates...
-import { logUpdates } from "./hooks/getUpdates";
+import logUpdates from "./hooks/logUpdates";
 
 // Actions available to the developer
 const choices: Actions[] = [

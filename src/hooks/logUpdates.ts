@@ -5,6 +5,7 @@ import { tone, toneLevel } from "tonelog";
 import type { NewsTypes } from "../types/structures";
 import { PACKAGE_NAME, NEWS_URL } from "../utils/constant";
 
+
 async function getInstalledVersion(): Promise<string | null> {
   try {
     const version = execSync("npm list -g skelpro --json", {
@@ -18,7 +19,7 @@ async function getInstalledVersion(): Promise<string | null> {
   }
 }
 
-export async function checkNewVersion(): Promise<string | undefined> {
+async function checkNewVersion(): Promise<string | undefined> {
   try {
     // Fetch latest version
     const response = await fetch("https://registry.npmjs.org/skelpro/latest");
@@ -32,7 +33,7 @@ export async function checkNewVersion(): Promise<string | undefined> {
   }
 }
 
-export async function fetchNews() {
+async function fetchNews() {
   try {
     const response = await fetch(NEWS_URL);
     const data = (await response.json()) as { news: NewsTypes };
@@ -44,7 +45,8 @@ export async function fetchNews() {
   }
 }
 
-export async function logUpdates() {
+
+async function logUpdates() {
   // logUpdates function will only be called when fetching a remote template.
   const newsData = await fetchNews();
   const localVersion = await getInstalledVersion();
@@ -69,3 +71,5 @@ export async function logUpdates() {
     });
   }
 }
+
+export default logUpdates;
