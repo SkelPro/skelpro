@@ -6,7 +6,7 @@ import main from "./src/index";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
 
 // News and Updates...
-import { logUpdates } from "./src/hooks/getUpdates";
+import logUpdates from "./src/hooks/logUpdates";
 
 const program = new Command();
 
