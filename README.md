@@ -4,6 +4,8 @@ SkelPro helps developers create consistent project structures quickly.
 
 ## Sentencified Overview
 
+> Note: This document uses the Sentencification technique, a proposed technical writing pattern for creating sentence-level overviews that improve document comprehension. Learn more: [https://open.substack.com/pub/sydney2o5/p/introducing-sentencification-a-new?utm_source=share&utm_medium=android&r=72irmu]
+
 1. SkelPro is a command-line tool that creates project folders and files from simple templates.
 2. You store your project templates as JSON files.
 3. SkelPro reads these templates and builds the complete folder structure for you.
