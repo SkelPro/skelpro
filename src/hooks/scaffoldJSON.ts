@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import type { JsonStructure } from "../types/structures";
-import { getFileExtension, imgExtensions } from "../utils/files";
+import { shouldIgnore, imgExtensions, getFileExtension } from "../utils/files";
 
 export default function scaffoldJSON(
   dir: string,
@@ -16,6 +16,11 @@ export default function scaffoldJSON(
     const fullPath = path.join(dir, key);
     const value: any = structure[key];
 
+    // Skip ignored patterns during scaffolding
+    if (shouldIgnore(fullPath, dir)) {
+      return;
+    }
+
     if (typeof value === "string") {
       const parentDir = path.dirname(fullPath);
       if (!fs.existsSync(parentDir)) {
@@ -23,11 +28,12 @@ export default function scaffoldJSON(
       }
 
       if (imgExtensions.includes(getFileExtension(key))) {
+        // Decode base64 image
         fs.writeFileSync(fullPath, Buffer.from(value.split(",")[1], "base64"));
       } else {
         fs.writeFileSync(fullPath, value, "utf8");
       }
-    } else {
+    } else if (typeof value === "object" && value !== null) {
       scaffoldJSON(fullPath, value);
     }
   });

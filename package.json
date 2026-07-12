@@ -1,6 +1,6 @@
 {
   "name": "skelpro",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "main": "./dist/src/index.js",
   "description": "SkelPro – where projects get their bones structured.",
   "scripts": {
@@ -35,6 +35,7 @@
   "dependencies": {
     "commander": "^13.0.0",
     "inquirer": "^12.3.0",
+    "minimatch": "^10.2.5",
     "node-fetch": "^3.3.2",
     "ora": "^5.4.1",
     "tonelog": "^2.0.7",

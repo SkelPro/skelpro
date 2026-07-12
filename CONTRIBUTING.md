@@ -60,9 +60,9 @@ git checkout -b your-branch-name
 
 To run SkelPro locally, follow these steps:
 
-- Compile the code by running: `npm run build` (recommended) or typing `tsc` in the Terminal.
+- Compile the code by running: `npm run build` (recommended) or typing `tsc` in the Terminal. This will create a `build` folder.
 
-- Create a **package.json** file for the build with the following content:
+- Create a **package.json** file inside the `build` folder with the following content:
 
 ```json
 {
@@ -102,7 +102,7 @@ Modify the code, add features, or fix bugs.
 #### 6. Link sklepro locally to test your changes, run:
 
 ```sh
-cd package_module
+cd build
 npm link
 skelpro --help
 ```

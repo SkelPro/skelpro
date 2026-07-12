@@ -39,6 +39,19 @@ https://raw.githubusercontent.com/<user>/<repo>/<branch>/file.json
 
 ---
 
+## Advanced Usage: Git Worktrees for Agents
+
+SkelPro now supports **isolated Git worktrees** — perfect for giving each AI agent its own clean, branch-isolated environment.
+
+### CLI Options
+
+```bash
+# Create project with dedicated worktree + branch
+skelpro create my-agent ./template.json --worktree --install
+
+# Or using short flag
+skelpro create my-agent ./template.json -w -i
+
 ### CLI Command Overview  
 ```bash
 skelpro [options] [command]
@@ -49,16 +62,18 @@ skelpro [options] [command]
 | -------------- | ------------------------- |
 | -i, --install  | Install dependencies      |
 | -v, --version  | Show version              |
+| -w, --worktree | Git worktree              |
 | -h, --help     | Show help                 |
+
 
 #### Commands:
 The below are the CLI commands SkelPro supports and their usage.
-| Command                                         | Usage                                                            |
+| Command                                        | Usage                                                                  |
 | ---------------------------------------------- | ---------------------------------------------------------------------- |
-| `launch`                                        | Launches the main CLI interface                                        |
-| `save <templateName> <projectPath>`        | Saves a new reusable project template in a JSON file                                  |
-| `create <projectName> <templatePath (or) URL>`   | Creates a project using a local or remote JSON template                |
-| `help [command]`                                | Show help for a specific command                                       |
+| `launch`                                       | Launches the main CLI interface                                        |
+| `save <templateName> <projectPath>`            | Saves a new reusable project template in a JSON file                   |
+| `create <projectName> <templatePath (or) URL>` | Creates a project using a local or remote JSON template                |
+| `help [command]`                               | Show help for a specific command                                       |
 
 ## Contributing 
 **Have any features you wish to add or you found a typo and would like to improve this documentation?...** Check out the [CONTRIBUTING](CONTRIBUTING.md) file for guidelines, we'd be glad to have you help out. We are also planning on integrating AI for this beautiful tool.

@@ -14,6 +14,7 @@ export interface Answers {
   fileName: string;
   baseName: string;
   install: boolean;
+  worktree?: boolean;
 }
 
 export interface NewsTypes {

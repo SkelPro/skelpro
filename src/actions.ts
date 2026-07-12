@@ -5,6 +5,7 @@ import type { JsonStructure } from "./types/structures";
 import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
 import installDeps from "./hooks/installDeps";
+import { createGitWorktree } from "./hooks/createWorktree";
 
 async function createTemplate(srcPath: string, fileName: string) {
   console.log("Creating template...");
@@ -25,11 +26,11 @@ async function createTemplate(srcPath: string, fileName: string) {
   );
 }
 
-
 async function scaffoldTemplate(
   srcPath: string,
   baseName: string,
-  install: boolean
+  install: boolean,
+  useWorktree: boolean = false
 ) {
   console.log("Scaffolding template...");
 
@@ -43,7 +44,17 @@ async function scaffoldTemplate(
       "Invalid file content: Unable to parse as FolderStructure."
     );
   }
-  scaffoldJSON(baseName, jsonFile);
+
+  // Support "worktree": true in JSON template
+  if (jsonFile.worktree === true) {
+    useWorktree = true;
+  }
+
+  if (useWorktree) {
+    await createGitWorktree(baseName, jsonFile);
+  } else {
+    scaffoldJSON(baseName, jsonFile);
+  }
 
   console.log(toneLevel.success(`Scaffolding ${baseName} completed.`, "done"));
 
@@ -57,7 +68,8 @@ async function scaffoldTemplate(
 async function fetchTemplate(
   url: string, 
   baseName: string, 
-  install: boolean
+  install: boolean,
+  useWorktree: boolean = false
 ) {
   console.log("Fetching template skeleton...");
 
@@ -71,7 +83,17 @@ async function fetchTemplate(
     }
 
     console.log("Scaffolding template...");
-    scaffoldJSON(baseName, jsonFile); // Scaffold the project
+
+    // Support "worktree": true in JSON template
+    if (jsonFile.worktree === true) {
+      useWorktree = true;
+    }
+
+    if (useWorktree) {
+      await createGitWorktree(baseName, jsonFile);
+    } else {
+      scaffoldJSON(baseName, jsonFile);
+    }
 
     console.log(
       toneLevel.success(
