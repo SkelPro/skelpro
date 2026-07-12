@@ -33,17 +33,28 @@ program
   });
 
 program
+  .command("cleanup <worktreePath>")
+  .description("Remove a Git worktree (for agents)")
+  .action((worktreePath) => {
+    import("./src/hooks/cleanupWorktree.js").then(({ cleanupWorktree }) => {
+      cleanupWorktree(worktreePath);
+    });
+  });
+
+program
   .command("create <projectName> <templatePath>")
   .description("Creates a project using a local or remote JSON template")
   .option("-i, --install", "Install dependencies flag")
+  .option("-w, --worktree", "Create as Git worktree with dedicated agent branch")
   .action(async (projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
+    const worktree = opt.worktree ? true : false;
 
     if (templatePath.startsWith("http")) {
-      fetchTemplate(templatePath, projectName, install);
+      fetchTemplate(templatePath, projectName, install, worktree);
       logUpdates();
     } else {
-      scaffoldTemplate(templatePath, projectName, install);
+      scaffoldTemplate(templatePath, projectName, install, worktree);
     }
   });
 

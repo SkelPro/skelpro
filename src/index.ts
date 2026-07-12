@@ -96,6 +96,14 @@ export default async function main() {
         answers.action === "Scaffold template" ||
         answers.action === "Fetch and Scaffold",
     },
+    {
+      type: "confirm",
+      name: "worktree",
+      message: "Create as Git worktree (isolated agent branch)?",
+      when: (answers) =>
+        answers.action === "Scaffold template" ||
+        answers.action === "Fetch and Scaffold",
+    },
   ]);
 
   await setup(answers); // Carryout the selected action
@@ -112,12 +120,12 @@ async function setup(answers: Answers) {
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(answers.srcPath, answers.baseName, answers.install);
+        scaffoldTemplate(answers.srcPath, answers.baseName, answers.install, answers.worktree);
         console.log("");
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(answers.url, answers.baseName, answers.install);
+        fetchTemplate(answers.url, answers.baseName, answers.install, answers.worktree);
         console.log("");
 
         logUpdates();
