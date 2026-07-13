@@ -15,14 +15,11 @@ async function createTemplate(srcPath: string, fileName: string) {
   fs.writeFileSync(
     `${fileName}.json`,
     JSON.stringify(folderStructure, null, 2),
-    "utf8"
-  ); 
+    "utf8",
+  );
 
   console.log(
-    toneLevel.success(
-      `Template created and saved to ${fileName}.json`,
-      "done"
-    )
+    toneLevel.success(`Template created and saved to ${fileName}.json`, "done"),
   );
 }
 
@@ -30,28 +27,29 @@ async function scaffoldTemplate(
   srcPath: string,
   baseName: string,
   install: boolean,
-  useWorktree: boolean = false
+  useWorktree: boolean = false,
+  branchName: string,
 ) {
   console.log("Scaffolding template...");
 
   const fileContent = fs.readFileSync(srcPath, "utf8");
+
   let jsonFile: JsonStructure;
 
   try {
     jsonFile = JSON.parse(fileContent);
-  } catch (parseError) {
+  } catch {
     throw new Error(
-      "Invalid file content: Unable to parse as FolderStructure."
+      "Invalid file content: Unable to parse as FolderStructure.",
     );
   }
 
-  // Support "worktree": true in JSON template
   if (jsonFile.worktree === true) {
     useWorktree = true;
   }
 
   if (useWorktree) {
-    await createGitWorktree(baseName, jsonFile);
+    await createGitWorktree(baseName, jsonFile, branchName);
   } else {
     scaffoldJSON(baseName, jsonFile);
   }
@@ -66,31 +64,31 @@ async function scaffoldTemplate(
 }
 
 async function fetchTemplate(
-  url: string, 
-  baseName: string, 
+  url: string,
+  baseName: string,
   install: boolean,
-  useWorktree: boolean = false
+  useWorktree: boolean = false,
+  branchName: string,
 ) {
   console.log("Fetching template skeleton...");
 
   try {
     const response = await fetch(url);
+
     const jsonFile: JsonStructure = (await response.json()) as JsonStructure;
 
-    // Validate JSON structure
     if (!jsonFile || typeof jsonFile !== "object") {
       throw new Error("Invalid JSON structure or empty response.");
     }
 
     console.log("Scaffolding template...");
 
-    // Support "worktree": true in JSON template
     if (jsonFile.worktree === true) {
       useWorktree = true;
     }
 
     if (useWorktree) {
-      await createGitWorktree(baseName, jsonFile);
+      await createGitWorktree(baseName, jsonFile, branchName);
     } else {
       scaffoldJSON(baseName, jsonFile);
     }
@@ -98,15 +96,15 @@ async function fetchTemplate(
     console.log(
       toneLevel.success(
         `Successfully scaffolded project: "${baseName}".`,
-        "done"
-      )
+        "done",
+      ),
     );
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error during Fetch and Scaffold:", error.message);
-    } else {
-      console.error("Error during Fetch and Scaffold:", String(error));
-    }
+    console.error(
+      "Error during Fetch and Scaffold:",
+      error instanceof Error ? error.message : String(error),
+    );
+
     throw error;
   }
 

@@ -33,10 +33,7 @@ export default async function main() {
   await typeglide({
     strings: [
       tone.bright_cyan("\n 💀 SkelPro"),
-      tone.white(
-
-        `Where projects get their bones structured!\n`
-      ),
+      tone.white(`Where projects get their bones structured!\n`),
     ],
     backspace: false,
     singleLine: true,
@@ -104,6 +101,19 @@ export default async function main() {
         answers.action === "Scaffold template" ||
         answers.action === "Fetch and Scaffold",
     },
+    {
+      type: "input",
+      name: "branchName",
+      message: "Enter Git branch name:",
+      validate(value) {
+        if (!value.trim()) {
+          return "Branch name is required when using worktree mode";
+        }
+
+        return true;
+      },
+      when: (answers) => answers.worktree === true,
+    },
   ]);
 
   await setup(answers); // Carryout the selected action
@@ -120,12 +130,24 @@ async function setup(answers: Answers) {
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(answers.srcPath, answers.baseName, answers.install, answers.worktree);
+        scaffoldTemplate(
+          answers.srcPath,
+          answers.baseName,
+          answers.install,
+          answers.worktree,
+          answers.branchName,
+        );
         console.log("");
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(answers.url, answers.baseName, answers.install, answers.worktree);
+        fetchTemplate(
+          answers.url,
+          answers.baseName,
+          answers.install,
+          answers.worktree,
+          answers.branchName,
+        );
         console.log("");
 
         logUpdates();
