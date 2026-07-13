@@ -14,7 +14,7 @@ program
   .name("Skelpro")
   .usage("[options] [command]")
   .description(
-    "A fast and simple tool to set up your project structure in seconds."
+    "A fast and simple tool to set up your project structure in seconds.",
   )
   .version(`Version ${VERSION}`, "-v, --version", "Output the version number");
 
@@ -45,18 +45,46 @@ program
   .command("create <projectName> <templatePath>")
   .description("Creates a project using a local or remote JSON template")
   .option("-i, --install", "Install dependencies flag")
-  .option("-w, --worktree", "Create as Git worktree with dedicated agent branch")
+  .option("-w, --worktree", "Create as Git worktree")
+  .option("-b, --branch <branchName>", "Git branch name for worktree")
   .action(async (projectName, templatePath, opt) => {
     const install = opt.install ? true : false;
     const worktree = opt.worktree ? true : false;
+    const branchName = opt.branch;
+
+    if (worktree && !branchName) {
+      console.error("Error: --branch is required when using --worktree");
+      process.exit(1);
+    }
 
     if (templatePath.startsWith("http")) {
-      fetchTemplate(templatePath, projectName, install, worktree);
-      logUpdates();
+      await fetchTemplate(
+        templatePath,
+        projectName,
+        install,
+        worktree,
+        branchName,
+      );
     } else {
-      scaffoldTemplate(templatePath, projectName, install, worktree);
+      await scaffoldTemplate(
+        templatePath,
+        projectName,
+        install,
+        worktree,
+        branchName,
+      );
     }
   });
+
+// Runs after every command completes
+program.hook("postAction", async () => {
+  try {
+    await logUpdates();
+  } catch (error) {
+    // Never break CLI because update checking failed
+    return;
+  }
+});
 
 program.parse(process.argv);
 
