@@ -4,7 +4,8 @@ SkelPro helps developers create consistent project structures quickly using reus
 
 Sentencified Overview
 
-«Note: This document uses the Sentencification technique, a proposed technical writing pattern for creating sentence-level overviews that improve document comprehension. "Learn more" (https://open.substack.com/pub/sydney2o5/p/introducing-sentencification-a-new?utm_source=share&utm_medium=android&r=72irmu)»
+> **Note:** This document uses the Sentencification technique, a proposed technical writing pattern for creating sentence-level overviews that improve document comprehension.  
+> Learn more: [Introducing Sentencification: A New Technical Writing Pattern](https://open.substack.com/pub/sydney2o5/p/introducing-sentencification-a-new)
 
 1. SkelPro is a command-line tool that generates complete project structures from JSON templates.
 2. You define your project structure using simple JSON template files.
