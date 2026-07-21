@@ -77,7 +77,7 @@ SkelPro will display available actions and guide you through the process.
 | `skelpro launch` | Start the interactive CLI interface |
 | `skelpro save <name> <path>` | Save an existing project as a JSON template |
 | `skelpro create <project> <template>` | Generate a project from a template |
-| `skelpro cleanup <worktree>` | Remove a Git worktree |
+| `skelpro cleanup <worktree>` | Remove a Git worktree and clean related references |
 | `skelpro --help` | Display available commands |
 
 ---
@@ -128,21 +128,15 @@ SkelPro supports Git worktrees to create isolated environments for AI agents or 
 Create a worktree with a custom branch:
 
 ```bash
-skelpro create agent-1 ./template.json --worktree --branch agent-feature
-```
-
-**Example:**
-
-```bash
 skelpro create backend-agent ./template.json --worktree --branch agent-backend-fix
 ```
 
-Each worktree receives its own Git branch, allowing multiple agents or developers to work independently.
+This creates an isolated worktree environment where the agent can work independently on its assigned branch.
 
 Remove a completed worktree:
 
 ```bash
-skelpro cleanup ./agent-1
+skelpro cleanup ./backend-agent
 ```
 
 ---
