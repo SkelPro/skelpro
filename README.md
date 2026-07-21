@@ -4,7 +4,9 @@ SkelPro helps developers create consistent project structures quickly using reus
 
 ## Sentencified Overview
 
-> Note: This document uses the Sentencification technique, a proposed technical writing pattern for creating sentence-level overviews that improve document comprehension. Learn more: https://open.substack.com/pub/sydney2o5/p/introducing-sentencification-a-new
+> **Note:** This document uses the Sentencification technique, a proposed technical writing pattern for creating sentence-level overviews that improve document comprehension.
+>
+> Learn more: [Introducing Sentencification: A New Technical Writing Pattern](https://open.substack.com/pub/sydney2o5/p/introducing-sentencification-a-new)
 
 1. SkelPro is a command-line tool that generates complete project structures from JSON templates.
 2. Developers define project structures using simple JSON template files.
@@ -23,7 +25,7 @@ SkelPro helps developers create consistent project structures quickly using reus
 
 ---
 
-# Overview
+## Overview
 
 SkelPro is a fast command-line tool that creates project structures from reusable JSON templates.
 
@@ -33,7 +35,7 @@ With built-in Git worktree support, SkelPro also enables developers and AI agent
 
 ---
 
-# Features
+## Features
 
 - **JSON Templates** — Define complete project structures using simple JSON files.
 - **Quick Scaffolding** — Generate folders and files instantly from templates.
@@ -49,190 +51,168 @@ With built-in Git worktree support, SkelPro also enables developers and AI agent
 
 ---
 
-# Installation
+## Installation
 
 Install SkelPro globally using npm:
 
 ```bash
 npm install -g skelpro
+```
 
-Prerequisite: Node.js version 18 or higher is required.
-
+> **Prerequisite:** Node.js version 18 or higher is required.
 
 ---
 
-Basic Usage
+## Basic Usage
 
 Start the interactive interface:
 
+```bash
 skelpro launch
+```
 
 SkelPro displays available actions and guides users through common workflows.
 
+---
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `skelpro launch` | Start the interactive CLI interface |
+| `skelpro save <name> <path>` | Save an existing project as a reusable JSON template |
+| `skelpro create <project> <template>` | Generate a project from a template |
+| `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
+| `skelpro --help` | Display available commands |
 
 ---
 
-Available Commands
+## Common Options
 
-Command	Description
-
-skelpro launch	Start the interactive CLI interface
-skelpro save <name> <path>	Save an existing project as a reusable JSON template
-skelpro create <project> <template>	Generate a project from a template
-skelpro cleanup <repoPath> <worktreePath>	Remove a Git worktree and clean related references
-skelpro --help	Display available commands
-
-
+| Option | Description |
+|--------|-------------|
+| `-i, --install` | Install dependencies after scaffolding |
+| `-w, --worktree` | Create an isolated Git worktree environment |
+| `-b, --branch <name>` | Specify the Git branch name for a worktree |
+| `-v, --version` | Show the installed SkelPro version |
 
 ---
 
-Common Options
+## Working With Templates
 
-Option	Description
-
--i, --install	Install dependencies after scaffolding
--w, --worktree	Create an isolated Git worktree environment
--b, --branch <name>	Specify the Git branch name for a worktree
--v, --version	Show the installed SkelPro version
-
-
-
----
-
-Working With Templates
-
-Create a Template
+### Create a Template
 
 Convert an existing project into a reusable template:
 
+```bash
 skelpro save my-template ./my-project
+```
 
 This creates a JSON template containing the project's structure.
 
+### Create a Project
 
----
+#### From a Local Template
 
-Create a Project
-
-From a Local Template
-
+```bash
 skelpro create my-new-app ./my-template.json
+```
 
-From a Remote Template
+#### From a Remote Template
 
+```bash
 skelpro create my-new-app https://raw.githubusercontent.com/user/repository/main/template.json
+```
 
 After creation, SkelPro initializes the generated project as an independent Git repository.
 
-
 ---
 
-Git Worktrees for AI Agents
+## Git Worktrees for AI Agents
 
 SkelPro supports Git worktrees for creating isolated environments for AI agents and parallel development.
 
 When a worktree is created, SkelPro:
 
 1. Creates the project structure.
-
-
 2. Initializes a Git repository.
-
-
 3. Creates the requested branch.
-
-
 4. Creates a separate worktree environment.
 
+### Example
 
-
-Example:
-
+```bash
 skelpro create backend-agent ./template.json --worktree --branch agent-backend-fix
+```
 
 This creates:
 
+```
 backend-agent/
 ├── .git/
 └── project files
 
 backend-agent-agent-backend-fix/
 └── isolated worktree
+```
 
 Each worktree has its own Git branch, allowing multiple agents or developers to work independently.
 
-
----
-
-Removing a Worktree
+### Removing a Worktree
 
 Remove a completed worktree:
 
+```bash
 skelpro cleanup ./backend-agent ./backend-agent-agent-backend-fix --branch agent-backend-fix
+```
 
 This will:
 
-Remove the Git worktree.
-
-Clean stale Git worktree references.
-
-Remove the associated branch.
-
-Delete leftover files.
-
-
+- Remove the Git worktree.
+- Clean stale Git worktree references.
+- Remove the associated branch.
+- Delete leftover files.
 
 ---
 
-Remote Template Requirements
+## Remote Template Requirements
 
 Remote templates must:
 
-Return valid JSON.
-
-Follow the SkelPro template structure format.
-
-Be accessible through a direct URL.
-
+- Return valid JSON.
+- Follow the SkelPro template structure format.
+- Be accessible through a direct URL.
 
 Recommended format:
 
+```
 https://raw.githubusercontent.com/user/repository/main/template.json
-
+```
 
 ---
 
-Update Notifications
+## Update Notifications
 
 SkelPro can notify users about new releases and important updates.
 
 Update checks are cached to reduce unnecessary network requests and improve CLI performance.
 
-
 ---
 
-Contributing
+## Contributing
 
 Contributions, improvements, and bug reports are welcome.
 
-1. Read CONTRIBUTING.md.
-
-
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md).
 2. Open an issue or submit a pull request.
-
-
 3. Suggest new features and improvements.
-
-
 
 Future versions may introduce additional AI-powered development workflows.
 
-
 ---
 
-License
+## License
 
 SkelPro is licensed under the Apache License 2.0.
 
-See the LICENSE file for details.
-```
+See the [LICENSE](LICENSE) file for details.
