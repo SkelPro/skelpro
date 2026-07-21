@@ -163,7 +163,7 @@ Each worktree has its own Git branch, allowing multiple agents or developers to 
 Remove a completed worktree:
 
 ```bash
-skelpro cleanup ./backend-agent ./backend-agent-agent-backend-fix --branch agent-backend-fix
+skelpro cleanup <repoPath> <worktreePath> --branch <branchName>
 ```
 
 This will:
