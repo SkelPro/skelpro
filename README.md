@@ -139,7 +139,7 @@ When a worktree is created, SkelPro:
 3. Creates the requested branch.
 4. Creates a separate worktree environment.
 
-### Example
+### Creating a Worktree
 
 ```bash
 skelpro create backend-agent ./template.json --worktree --branch agent-backend-fix
@@ -160,18 +160,34 @@ Each worktree has its own Git branch, allowing multiple agents or developers to 
 
 ### Removing a Worktree
 
-Remove a completed worktree:
+Once the work is complete, remove the worktree and clean up associated Git references:
+
+#### Syntax
 
 ```bash
 skelpro cleanup <repoPath> <worktreePath> --branch <branchName>
 ```
 
+#### Usage Example
+
+```bash
+skelpro cleanup ./backend-agent ./backend-agent-agent-backend-fix --branch agent-backend-fix
+```
+
 This will:
 
-- Remove the Git worktree.
-- Clean stale Git worktree references.
-- Remove the associated branch.
-- Delete leftover files.
+- Remove the Git worktree at `./backend-agent-agent-backend-fix`
+- Clean stale Git worktree references from the main repository
+- Delete the `agent-backend-fix` branch
+- Remove any leftover temporary files
+
+#### Another Example
+
+For a frontend agent worktree:
+
+```bash
+skelpro cleanup ./frontend-app ./frontend-app-agent-ui-redesign --branch agent-ui-redesign
+```
 
 ---
 
