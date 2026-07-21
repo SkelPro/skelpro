@@ -1,4 +1,4 @@
-# Skeleton Project (SkelPro) 💀
+# Skeleton Project (SkelPro) 💀 
 
 SkelPro helps developers create consistent project structures quickly using reusable templates.
 
