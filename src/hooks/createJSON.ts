@@ -2,34 +2,57 @@ import fs from "fs";
 import path from "path";
 
 import type { JsonStructure } from "../types/structures";
-import { shouldIgnore, imgExtensions, getFileExtension } from "../utils/files";
+import { isBinaryContent, encodeBinary } from "../utils/files";
+import {
+  createIgnoreMatcher,
+  type IgnoreMatcher,
+  type IgnoreOptions,
+} from "../utils/ignore";
 
-export default function createJSON(dir: string): JsonStructure {
-  let result: JsonStructure = {};
-  const items = fs.readdirSync(dir, { withFileTypes: true });
+export interface CreateJSONOptions extends IgnoreOptions {
+  /** Receives the relative path of every file or folder that was skipped. */
+  skipped?: string[];
+}
 
-  items.forEach((item) => {
-    const itemPath = path.join(dir, item.name);
+function walk(
+  root: string,
+  relDir: string,
+  matcher: IgnoreMatcher,
+  skipped: string[],
+): JsonStructure {
+  const result: JsonStructure = {};
+  const items = fs.readdirSync(path.join(root, relDir), { withFileTypes: true });
 
-    if (shouldIgnore(itemPath, dir)) {
-      return; // Skip ignored files/folders
+  for (const item of items) {
+    const relPath = relDir ? path.join(relDir, item.name) : item.name;
+    const itemPath = path.join(root, relPath);
+    const isDir = item.isDirectory();
+
+    if (matcher.ignores(relPath, isDir)) {
+      skipped.push(relPath.split(path.sep).join("/") + (isDir ? "/" : ""));
+      continue;
     }
 
-    if (item.isDirectory()) {
-      result[item.name] = createJSON(itemPath);
-    } else {
-      const ext = getFileExtension(item.name);
+    if (isDir) {
+      result[item.name] = walk(root, relPath, matcher, skipped);
+    } else if (item.isFile()) {
+      const content = fs.readFileSync(itemPath);
 
-      if (imgExtensions.includes(ext)) {
-        // Encode image files in base64
-        const imgContent = fs.readFileSync(itemPath, "base64");
-        result[item.name] = `data:image/\( {ext.slice(1)};base64, \){imgContent}`;
-      } else {
-        const fileContent = fs.readFileSync(itemPath, "utf8");
-        result[item.name] = fileContent;
-      }
+      // Binary files (images, fonts, PDFs...) are stored as base64 data URIs.
+      result[item.name] = isBinaryContent(content, item.name)
+        ? encodeBinary(content, item.name)
+        : content.toString("utf8");
     }
-  });
+  }
 
   return result;
+}
+
+export default function createJSON(
+  dir: string,
+  options: CreateJSONOptions = {},
+): JsonStructure {
+  const root = path.resolve(dir);
+  const matcher = createIgnoreMatcher(root, options);
+  return walk(root, "", matcher, options.skipped ?? []);
 }

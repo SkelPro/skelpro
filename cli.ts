@@ -10,6 +10,11 @@ import logUpdates from "./src/hooks/logUpdates";
 
 const program = new Command();
 
+/** Lets an option be given more than once: --include a --include b */
+function collect(value: string, previous: string[]): string[] {
+  return [...previous, value];
+}
+
 program
   .name("Skelpro")
   .usage("[options] [command]")
@@ -28,8 +33,23 @@ program
 program
   .command("save <templateName> <projectPath>")
   .description("Saves a new reusable project template")
-  .action((templateName, projectPath) => {
-    createTemplate(projectPath, templateName);
+  .option(
+    "--include <glob>",
+    "Always keep paths matching this glob (repeatable)",
+    collect,
+    [],
+  )
+  .option(
+    "--exclude <glob>",
+    "Also skip paths matching this glob (repeatable)",
+    collect,
+    [],
+  )
+  .action(async (templateName, projectPath, opt) => {
+    await createTemplate(projectPath, templateName, {
+      include: opt.include,
+      exclude: opt.exclude,
+    });
   });
 
 program

@@ -2,39 +2,61 @@ import fs from "fs";
 import path from "path";
 
 import type { JsonStructure } from "../types/structures";
-import { shouldIgnore, imgExtensions, getFileExtension } from "../utils/files";
+import { decodeBinary } from "../utils/files";
+import { safeJoin } from "../utils/paths";
+
+type PlannedEntry =
+  | { kind: "dir"; path: string }
+  | { kind: "file"; path: string; content: string | Buffer };
+
+/**
+ * Walks the template and resolves every path against the project root.
+ * Throws on the first unsafe key, before anything has been written.
+ */
+function planStructure(
+  root: string,
+  relDir: string,
+  structure: JsonStructure,
+  plan: PlannedEntry[],
+): void {
+  for (const key of Object.keys(structure)) {
+    const value: unknown = structure[key];
+    const relPath = relDir ? path.join(relDir, key) : key;
+    const fullPath = safeJoin(root, relPath);
+
+    // No ignore rules here: if a template contains a file, its author wanted it.
+    if (typeof value === "string") {
+      plan.push({
+        kind: "file",
+        path: fullPath,
+        content: decodeBinary(value) ?? value,
+      });
+    } else if (typeof value === "object" && value !== null) {
+      plan.push({ kind: "dir", path: fullPath });
+      planStructure(root, relPath, value as JsonStructure, plan);
+    }
+    // Other values (e.g. the v1 `worktree: true` flag) are settings, not files.
+  }
+}
 
 export default function scaffoldJSON(
   dir: string,
-  structure: JsonStructure
+  structure: JsonStructure,
 ): void {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  const root = path.resolve(dir);
+  const plan: PlannedEntry[] = [];
+
+  // Validate the whole template first, so a bad template writes zero files.
+  planStructure(root, "", structure, plan);
+
+  fs.mkdirSync(root, { recursive: true });
+
+  for (const entry of plan) {
+    if (entry.kind === "dir") {
+      fs.mkdirSync(entry.path, { recursive: true });
+    } else {
+      fs.mkdirSync(path.dirname(entry.path), { recursive: true });
+      fs.writeFileSync(entry.path, entry.content);
+    }
   }
-
-  Object.keys(structure).forEach((key) => {
-    const fullPath = path.join(dir, key);
-    const value: any = structure[key];
-
-    // Skip ignored patterns during scaffolding
-    if (shouldIgnore(fullPath, dir)) {
-      return;
-    }
-
-    if (typeof value === "string") {
-      const parentDir = path.dirname(fullPath);
-      if (!fs.existsSync(parentDir)) {
-        fs.mkdirSync(parentDir, { recursive: true });
-      }
-
-      if (imgExtensions.includes(getFileExtension(key))) {
-        // Decode base64 image
-        fs.writeFileSync(fullPath, Buffer.from(value.split(",")[1], "base64"));
-      } else {
-        fs.writeFileSync(fullPath, value, "utf8");
-      }
-    } else if (typeof value === "object" && value !== null) {
-      scaffoldJSON(fullPath, value);
-    }
-  });
 }

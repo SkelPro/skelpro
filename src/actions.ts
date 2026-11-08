@@ -1,16 +1,32 @@
 import fs from "fs";
 import { toneLevel } from "tonelog";
 import type { JsonStructure } from "./types/structures";
+import type { IgnoreOptions } from "./utils/ignore";
 
 import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
 import installDeps from "./hooks/installDeps";
 import { createGitWorktree } from "./hooks/createWorktree";
 
-async function createTemplate(srcPath: string, fileName: string) {
+async function createTemplate(
+  srcPath: string,
+  fileName: string,
+  options: IgnoreOptions = {},
+) {
   console.log("Creating template...");
 
-  const folderStructure = createJSON(srcPath);
+  const skipped: string[] = [];
+  const folderStructure = createJSON(srcPath, { ...options, skipped });
+
+  if (skipped.length) {
+    console.log(
+      toneLevel.info(
+        `Skipped ${skipped.length} ignored path(s): ${skipped.slice(0, 10).join(", ")}` +
+          (skipped.length > 10 ? `, and ${skipped.length - 10} more` : ""),
+      ),
+    );
+    console.log("Use --include <glob> to keep any of them.");
+  }
 
   fs.writeFileSync(
     `${fileName}.json`,
