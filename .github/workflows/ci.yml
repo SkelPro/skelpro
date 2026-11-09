@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - main # main is covered by the release workflow, which also runs the tests
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # path handling and Python venv paths differ per OS; see every failure
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+  commits:
+    name: Conventional commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # semantic-release picks the next version from these messages, so a
+      # commit like "Update README.md" would silently be left out of a release.
+      - name: Check commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([A-Za-z0-9._/-]+\))?!?: .+'
+          bad=0
+          while IFS= read -r subject; do
+            case "$subject" in Merge\ *) continue ;; esac
+            if ! printf '%s\n' "$subject" | grep -Eq "$pattern"; then
+              echo "::error::Not a conventional commit: $subject"
+              bad=1
+            fi
+          done < <(git log --format=%s "$BASE_SHA..$HEAD_SHA")
+          if [ "$bad" -ne 0 ]; then
+            echo "Use messages like 'feat: add X', 'fix(save): handle Y' or 'docs: update Z'."
+            echo "See CONTRIBUTING.md#commit-message-format"
+            exit 1
+          fi
