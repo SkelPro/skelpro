@@ -82,6 +82,7 @@ SkelPro displays available actions and guides users through common workflows.
 | `skelpro launch` | Start the interactive CLI interface |
 | `skelpro save <name> <path>` | Save an existing project as a reusable JSON template |
 | `skelpro create <project> <template>` | Generate a project from a template |
+| `skelpro info <template>` | Show a template's name, description, variables and files |
 | `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
 | `skelpro --help` | Display available commands |
 
@@ -89,11 +90,44 @@ SkelPro displays available actions and guides users through common workflows.
 
 ## Common Options
 
+### `create`
+
 | Option | Description |
 |--------|-------------|
+| `--var <name=value>` | Set a template variable (repeatable) |
+| `--vars <file>` | Read template variables from a JSON file |
+| `-y, --yes` | Use defaults and never prompt; missing variables are an error |
 | `-i, --install` | Install dependencies after scaffolding |
 | `-w, --worktree` | Create an isolated Git worktree environment |
 | `-b, --branch <name>` | Specify the Git branch name for a worktree |
+
+### `save`
+
+| Option | Description |
+|--------|-------------|
+| `--var <name=value>` | Replace this value with `{{name}}`, making a v2 template (repeatable) |
+| `--description <text>` | Description for a v2 template |
+| `--include <glob>` | Always keep matching paths, even if ignored (repeatable) |
+| `--exclude <glob>` | Also skip matching paths (repeatable) |
+
+### `info`
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Print machine-readable JSON |
+
+### `cleanup`
+
+| Option | Description |
+|--------|-------------|
+| `-b, --branch <name>` | Also delete this branch |
+| `-f, --force` | Discard uncommitted changes and delete the branch even if unmerged |
+
+### Global
+
+| Option | Description |
+|--------|-------------|
+| `-q, --quiet` | Don't print news or update notices |
 | `-v, --version` | Show the installed SkelPro version |
 
 ---
@@ -108,7 +142,7 @@ Convert an existing project into a reusable template:
 skelpro save my-template ./my-project
 ```
 
-This creates a JSON template containing the project's structure.
+This creates a JSON template containing the project's structure. Files listed in the project's `.gitignore`, plus things that are never source (`node_modules`, `.git`, `.env` files, keys and top-level build folders), are skipped, and SkelPro prints what it skipped.
 
 ### Create a Project
 
@@ -124,7 +158,27 @@ skelpro create my-new-app ./my-template.json
 skelpro create my-new-app https://raw.githubusercontent.com/user/repository/main/template.json
 ```
 
-After creation, SkelPro initializes the generated project as an independent Git repository.
+With `--worktree`, SkelPro also initializes the generated project as an independent Git repository (see [Git Worktrees for AI Agents](#git-worktrees-for-ai-agents)).
+
+### Template Variables
+
+Templates in format v2 declare variables and use `{{placeholders}}` in file contents and file names, so one template can produce differently named projects:
+
+```bash
+skelpro info ./node-api.json                                   # see which variables it takes
+skelpro create my-api ./node-api.json --var port=8080          # missing values are prompted for
+skelpro create my-api ./node-api.json --vars answers.json --yes # no prompts (agents, CI)
+```
+
+Turn an existing project into a v2 template by naming the values to replace:
+
+```bash
+skelpro save node-api ./my-api --var projectName=my-api --var port=3000
+```
+
+`my-api` (and variants such as `MyApi`) becomes `{{projectName}}` everywhere, and SkelPro prints every replacement so you can check it.
+
+Templates without variables keep working exactly as before. See the [template reference](docs/templates.md) for the full format: variable types, case helpers, optional files with `$when`, escaping, and the JSON Schema for editor autocomplete.
 
 ---
 
@@ -180,6 +234,8 @@ This will:
 - Clean stale Git worktree references from the main repository
 - Delete the `agent-backend-fix` branch
 - Remove any leftover temporary files
+
+To protect work, `cleanup` refuses a worktree with uncommitted changes and refuses to delete a branch that isn't merged. Pass `--force` to discard them. It also never deletes a folder that Git doesn't list as one of the repository's worktrees.
 
 #### Another Example
 

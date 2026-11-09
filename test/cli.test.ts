@@ -85,7 +85,7 @@ describe("exit codes (B7)", { timeout: 60_000 }, () => {
     fs.writeFileSync(path.join(work, "t.json"), JSON.stringify({ "../escaped.txt": "x" }));
     const r = cli("create", "app", "./t.json");
     expect(r.status).toBe(1);
-    expect(r.stderr).toMatch(/escapes project folder/);
+    expect(r.stderr).toMatch(/escapes project folder|Unsafe template path/);
     expect(fs.existsSync(path.join(path.dirname(work), "escaped.txt"))).toBe(false);
   });
 

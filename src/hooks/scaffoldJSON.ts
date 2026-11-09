@@ -3,7 +3,7 @@ import path from "path";
 
 import type { JsonStructure } from "../types/structures";
 import { decodeBinary } from "../utils/files";
-import { safeJoin } from "../utils/paths";
+import { assertSafeKey, safeJoin } from "../utils/paths";
 
 type PlannedEntry =
   | { kind: "dir"; path: string }
@@ -21,6 +21,7 @@ function planStructure(
 ): void {
   for (const key of Object.keys(structure)) {
     const value: unknown = structure[key];
+    assertSafeKey(key);
     const relPath = relDir ? path.join(relDir, key) : key;
     const fullPath = safeJoin(root, relPath);
 

@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/SkelPro/skelpro/main/schema/template-v2.json",
+  "title": "SkelPro template (format v2)",
+  "description": "A SkelPro project template with declared variables, {{placeholders}} and optional files. See docs/templates.md.",
+  "type": "object",
+  "required": ["skelpro", "files"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Link to this schema, for editor autocomplete."
+    },
+    "skelpro": {
+      "const": 2,
+      "description": "Template format version. Templates without this key are read as v1 (a plain file tree, never rendered)."
+    },
+    "name": {
+      "type": "string",
+      "description": "Template name, shown by `skelpro info`."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the template creates, shown by `skelpro info`."
+    },
+    "worktree": {
+      "type": "boolean",
+      "description": "Always create the project as a Git worktree (same as `create --worktree`)."
+    },
+    "variables": {
+      "type": "object",
+      "description": "Values the template asks for. Use them as {{name}} in file contents and names. `projectName`, `year` and `date` are always available.",
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+      },
+      "additionalProperties": { "$ref": "#/$defs/variable" }
+    },
+    "files": {
+      "$ref": "#/$defs/folder",
+      "description": "The file tree. Keys are file or folder names (may contain {{placeholders}} and / for nested paths). A string is a file's content; an object is a folder, or a conditional file if it has $content."
+    }
+  },
+  "$defs": {
+    "variable": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["string", "number", "boolean", "enum"]
+        },
+        "description": {
+          "type": "string",
+          "description": "Shown when prompting and by `skelpro info`."
+        },
+        "default": {
+          "type": ["string", "number", "boolean"],
+          "description": "Used when no value is given. Without a default the variable is required (except projectName, which defaults to the project name)."
+        },
+        "pattern": {
+          "type": "string",
+          "format": "regex",
+          "description": "Regular expression a string value must match."
+        },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Allowed values for an enum variable."
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "enum" } } },
+          "then": {
+            "required": ["options"],
+            "properties": { "default": { "type": "string" } }
+          },
+          "else": { "not": { "required": ["options"] } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "string" } } },
+          "then": { "properties": { "default": { "type": "string" } } },
+          "else": { "not": { "required": ["pattern"] } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "number" } } },
+          "then": { "properties": { "default": { "type": "number" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "boolean" } } },
+          "then": { "properties": { "default": { "type": "boolean" } } }
+        }
+      ]
+    },
+    "condition": {
+      "type": "string",
+      "description": "Include this only when the condition holds: `name`, `!name`, `name == 'value'` or `name != 'value'`. No other expressions are allowed.",
+      "pattern": "^\\s*(!\\s*[A-Za-z_][A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*(\\s*(==|!=)\\s*('[^']*'|\"[^\"]*\"|-?\\d+(\\.\\d+)?|true|false))?)\\s*$"
+    },
+    "conditionalFile": {
+      "type": "object",
+      "description": "A file that is only created when $when holds.",
+      "required": ["$content"],
+      "properties": {
+        "$when": { "$ref": "#/$defs/condition" },
+        "$content": {
+          "type": "string",
+          "description": "The file's content. Base64 data URIs (data:...;base64,...) are written as binary and never rendered."
+        }
+      },
+      "additionalProperties": false
+    },
+    "folder": {
+      "type": "object",
+      "properties": {
+        "$when": { "$ref": "#/$defs/condition" }
+      },
+      "propertyNames": {
+        "description": "File or folder name. Names starting with $ are reserved; .. segments and absolute paths are refused.",
+        "anyOf": [
+          { "const": "$when" },
+          { "pattern": "^[^$]" }
+        ],
+        "not": {
+          "anyOf": [
+            { "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)" },
+            { "pattern": "^[\\\\/]" },
+            { "pattern": "^[A-Za-z]:" }
+          ]
+        }
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "File content; {{placeholders}} are rendered, \\{{ is a literal {{."
+          },
+          { "$ref": "#/$defs/conditionalFile" },
+          { "$ref": "#/$defs/folder" }
+        ]
+      }
+    }
+  }
+}

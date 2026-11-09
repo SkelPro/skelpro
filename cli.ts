@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
-import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
+import { createTemplate, scaffoldTemplate, describeTemplate } from "./src/actions";
 import { cleanupWorktree } from "./src/hooks/cleanupWorktree";
 
 // News and Updates...
@@ -47,10 +47,19 @@ program
     collect,
     [],
   )
+  .option(
+    "--var <name=value>",
+    "Replace this value with {{name}} to make a v2 template (repeatable)",
+    collect,
+    [],
+  )
+  .option("--description <text>", "Description for a v2 template")
   .action(async (templateName, projectPath, opt) => {
     await createTemplate(projectPath, templateName, {
       include: opt.include,
       exclude: opt.exclude,
+      vars: opt.var,
+      description: opt.description,
     });
   });
 
@@ -75,25 +84,67 @@ program
   .option("-i, --install", "Install dependencies flag")
   .option("-w, --worktree", "Create as Git worktree")
   .option("-b, --branch <branchName>", "Git branch name for worktree")
+  .option(
+    "--var <name=value>",
+    "Set a template variable (repeatable)",
+    collect,
+    [],
+  )
+  .option("--vars <file>", "Read template variables from a JSON file")
+  .option("-y, --yes", "Use defaults and never prompt; missing variables are an error")
   .action(async (projectName, templatePath, opt) => {
-    const install = Boolean(opt.install);
     const worktree = Boolean(opt.worktree);
-    const branchName = opt.branch;
 
-    if (worktree && !branchName) {
+    if (worktree && !opt.branch) {
       throw new Error("--branch is required when using --worktree");
     }
 
-    if (/^https?:\/\//i.test(templatePath)) {
-      await fetchTemplate(templatePath, projectName, install, worktree, branchName);
-    } else {
-      await scaffoldTemplate(templatePath, projectName, install, worktree, branchName);
+    await scaffoldTemplate(
+      templatePath,
+      projectName,
+      Boolean(opt.install),
+      worktree,
+      opt.branch,
+      { vars: opt.var, varsFile: opt.vars, yes: Boolean(opt.yes) },
+    );
+  });
+
+program
+  .command("info <templatePath>")
+  .description("Show a template's name, description, variables and files")
+  .option("--json", "Print machine-readable JSON")
+  .action(async (templatePath, opt) => {
+    const info = await describeTemplate(templatePath);
+
+    if (opt.json) {
+      console.log(JSON.stringify(info, null, 2));
+      return;
     }
+
+    console.log(`${info.name ?? templatePath} (template v${info.version})`);
+    if (info.description) console.log(info.description);
+
+    const vars = Object.entries(info.variables);
+    console.log(`\nVariables${vars.length ? "" : ": none"}`);
+    for (const [name, def] of vars) {
+      const details = [
+        def.type,
+        def.default !== undefined ? `default ${JSON.stringify(def.default)}` : name === "projectName" ? "default: project name" : "required",
+        def.options ? `one of ${def.options.join("|")}` : "",
+        def.pattern ? `pattern ${def.pattern}` : "",
+      ].filter(Boolean);
+      console.log(`  ${name}  ${details.join(", ")}${def.description ? `  - ${def.description}` : ""}`);
+    }
+
+    console.log(`\nFiles (${info.files.length})`);
+    for (const file of info.files.slice(0, 50)) console.log(`  ${file}`);
+    if (info.files.length > 50) console.log(`  ...and ${info.files.length - 50} more`);
   });
 
 // Runs after every command completes successfully
-program.hook("postAction", async () => {
-  if (updatesDisabled(program.opts().quiet)) return;
+program.hook("postAction", async (_program, actionCommand) => {
+  // Machine-readable output must stay parseable: no banner after --json.
+  if (updatesDisabled(program.opts().quiet) || actionCommand.opts().json) return;
   try {
     await logUpdates();
   } catch {
