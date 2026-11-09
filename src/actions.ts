@@ -39,6 +39,39 @@ async function createTemplate(
   );
 }
 
+/** Scaffolds a parsed template, then optionally installs dependencies. */
+async function buildProject(
+  jsonFile: JsonStructure,
+  baseName: string,
+  install: boolean,
+  useWorktree: boolean,
+  branchName: string,
+) {
+  if (!jsonFile || typeof jsonFile !== "object" || Array.isArray(jsonFile)) {
+    throw new Error("Invalid template: expected a JSON object.");
+  }
+
+  if (jsonFile.worktree === true) {
+    useWorktree = true;
+  }
+
+  if (useWorktree) {
+    if (!branchName) {
+      throw new Error("A branch name is required to create a worktree (use --branch).");
+    }
+    await createGitWorktree(baseName, jsonFile, branchName);
+  } else {
+    scaffoldJSON(baseName, jsonFile);
+  }
+
+  console.log(toneLevel.success(`Scaffolding ${baseName} completed.`, "done"));
+
+  if (install) {
+    await installDeps(baseName);
+    console.log("All dependencies installed.");
+  }
+}
+
 async function scaffoldTemplate(
   srcPath: string,
   baseName: string,
@@ -51,32 +84,13 @@ async function scaffoldTemplate(
   const fileContent = fs.readFileSync(srcPath, "utf8");
 
   let jsonFile: JsonStructure;
-
   try {
     jsonFile = JSON.parse(fileContent);
   } catch {
-    throw new Error(
-      "Invalid file content: Unable to parse as FolderStructure.",
-    );
+    throw new Error(`Invalid template: ${srcPath} is not valid JSON.`);
   }
 
-  if (jsonFile.worktree === true) {
-    useWorktree = true;
-  }
-
-  if (useWorktree) {
-    await createGitWorktree(baseName, jsonFile, branchName);
-  } else {
-    scaffoldJSON(baseName, jsonFile);
-  }
-
-  console.log(toneLevel.success(`Scaffolding ${baseName} completed.`, "done"));
-
-  if (install) {
-    installDeps(baseName)
-      .then(() => console.log("All dependencies installed."))
-      .catch((err) => console.error("Failed to install dependencies:", err));
-  }
+  await buildProject(jsonFile, baseName, install, useWorktree, branchName);
 }
 
 async function fetchTemplate(
@@ -88,47 +102,20 @@ async function fetchTemplate(
 ) {
   console.log("Fetching template skeleton...");
 
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Could not fetch template: ${response.status} ${response.statusText} (${url})`);
+  }
+
+  let jsonFile: JsonStructure;
   try {
-    const response = await fetch(url);
-
-    const jsonFile: JsonStructure = (await response.json()) as JsonStructure;
-
-    if (!jsonFile || typeof jsonFile !== "object") {
-      throw new Error("Invalid JSON structure or empty response.");
-    }
-
-    console.log("Scaffolding template...");
-
-    if (jsonFile.worktree === true) {
-      useWorktree = true;
-    }
-
-    if (useWorktree) {
-      await createGitWorktree(baseName, jsonFile, branchName);
-    } else {
-      scaffoldJSON(baseName, jsonFile);
-    }
-
-    console.log(
-      toneLevel.success(
-        `Successfully scaffolded project: "${baseName}".`,
-        "done",
-      ),
-    );
-  } catch (error) {
-    console.error(
-      "Error during Fetch and Scaffold:",
-      error instanceof Error ? error.message : String(error),
-    );
-
-    throw error;
+    jsonFile = (await response.json()) as JsonStructure;
+  } catch {
+    throw new Error(`Invalid template: ${url} did not return valid JSON.`);
   }
 
-  if (install) {
-    installDeps(baseName)
-      .then(() => console.log("All dependencies installed."))
-      .catch((err) => console.error("Failed to install dependencies:", err));
-  }
+  console.log("Scaffolding template...");
+  await buildProject(jsonFile, baseName, install, useWorktree, branchName);
 }
 
 export { createTemplate, fetchTemplate, scaffoldTemplate };

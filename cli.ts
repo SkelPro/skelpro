@@ -4,9 +4,10 @@ import { Command } from "commander";
 import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./src/actions";
+import { cleanupWorktree } from "./src/hooks/cleanupWorktree";
 
 // News and Updates...
-import logUpdates from "./src/hooks/logUpdates";
+import logUpdates, { updatesDisabled } from "./src/hooks/logUpdates";
 
 const program = new Command();
 
@@ -16,18 +17,19 @@ function collect(value: string, previous: string[]): string[] {
 }
 
 program
-  .name("Skelpro")
+  .name("skelpro")
   .usage("[options] [command]")
   .description(
     "A fast and simple tool to set up your project structure in seconds.",
   )
-  .version(`Version ${VERSION}`, "-v, --version", "Output the version number");
+  .version(`Version ${VERSION}`, "-v, --version", "Output the version number")
+  .option("-q, --quiet", "Don't print news or update notices");
 
 program
   .command("launch")
   .description("Launches the main CLI interface")
-  .action(() => {
-    main().catch((error) => console.error(error));
+  .action(async () => {
+    await main();
   });
 
 program
@@ -53,11 +55,17 @@ program
   });
 
 program
-  .command("cleanup <worktreePath>")
-  .description("Remove a Git worktree (for agents)")
-  .action((worktreePath) => {
-    import("./src/hooks/cleanupWorktree.js").then(({ cleanupWorktree }) => {
-      cleanupWorktree(worktreePath);
+  .command("cleanup <repoPath> <worktreePath>")
+  .description("Remove a Git worktree and clean related references (for agents)")
+  .option("-b, --branch <branchName>", "Also delete this branch")
+  .option(
+    "-f, --force",
+    "Discard uncommitted changes and delete the branch even if unmerged",
+  )
+  .action((repoPath, worktreePath, opt) => {
+    cleanupWorktree(repoPath, worktreePath, {
+      branch: opt.branch,
+      force: Boolean(opt.force),
     });
   });
 
@@ -68,46 +76,44 @@ program
   .option("-w, --worktree", "Create as Git worktree")
   .option("-b, --branch <branchName>", "Git branch name for worktree")
   .action(async (projectName, templatePath, opt) => {
-    const install = opt.install ? true : false;
-    const worktree = opt.worktree ? true : false;
+    const install = Boolean(opt.install);
+    const worktree = Boolean(opt.worktree);
     const branchName = opt.branch;
 
     if (worktree && !branchName) {
-      console.error("Error: --branch is required when using --worktree");
-      process.exit(1);
+      throw new Error("--branch is required when using --worktree");
     }
 
-    if (templatePath.startsWith("http")) {
-      await fetchTemplate(
-        templatePath,
-        projectName,
-        install,
-        worktree,
-        branchName,
-      );
+    if (/^https?:\/\//i.test(templatePath)) {
+      await fetchTemplate(templatePath, projectName, install, worktree, branchName);
     } else {
-      await scaffoldTemplate(
-        templatePath,
-        projectName,
-        install,
-        worktree,
-        branchName,
-      );
+      await scaffoldTemplate(templatePath, projectName, install, worktree, branchName);
     }
   });
 
-// Runs after every command completes
+// Runs after every command completes successfully
 program.hook("postAction", async () => {
+  if (updatesDisabled(program.opts().quiet)) return;
   try {
     await logUpdates();
-  } catch (error) {
+  } catch {
     // Never break CLI because update checking failed
-    return;
   }
 });
 
-program.parse(process.argv);
+async function run() {
+  if (!process.argv.slice(2).length) {
+    program.outputHelp();
+    return;
+  }
 
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+  try {
+    await program.parseAsync(process.argv);
+  } catch (error) {
+    // Agents and CI rely on the exit code, so failures must never exit 0.
+    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    process.exitCode = 1;
+  }
 }
+
+run();

@@ -6,9 +6,6 @@ import type { Actions, Answers } from "./types/structures";
 import { createTemplate, scaffoldTemplate, fetchTemplate } from "./actions";
 import { ASCII_ART } from "./utils/constant";
 
-// News and Updates...
-import logUpdates from "./hooks/logUpdates";
-
 // Actions available to the developer
 const choices: Actions[] = [
   {
@@ -79,11 +76,11 @@ export default async function main() {
     {
       type: "input",
       name: "baseName",
-      message: "Whats's the name of your project:",
+      message: "What's the name of your project:",
       when: (answers) =>
         answers.action === "Scaffold template" ||
         answers.action === "Fetch and Scaffold",
-      validate: (input) => (input ? true : "Project name name cannot be empty"),
+      validate: (input) => (input ? true : "Project name cannot be empty"),
     },
     {
       type: "confirm",
@@ -126,11 +123,11 @@ async function setup(answers: Answers) {
   try {
     switch (answers.action) {
       case "Create template": {
-        createTemplate(answers.srcPath, answers.fileName);
+        await createTemplate(answers.srcPath, answers.fileName);
         break;
       }
       case "Scaffold template": {
-        scaffoldTemplate(
+        await scaffoldTemplate(
           answers.srcPath,
           answers.baseName,
           answers.install,
@@ -141,7 +138,7 @@ async function setup(answers: Answers) {
         break;
       }
       case "Fetch and Scaffold": {
-        fetchTemplate(
+        await fetchTemplate(
           answers.url,
           answers.baseName,
           answers.install,
@@ -149,8 +146,6 @@ async function setup(answers: Answers) {
           answers.branchName,
         );
         console.log("");
-
-        logUpdates();
         break;
       }
       case "Exit":
@@ -161,8 +156,7 @@ async function setup(answers: Answers) {
     }
   } catch (error) {
     console.log(tone.error("⚠ Something went wrong."));
-    console.error(error);
-  } finally {
-    console.log(".");
+    // Rethrow so the CLI exits with a non-zero code.
+    throw error;
   }
 }

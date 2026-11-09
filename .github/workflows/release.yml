@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write # create GitHub releases and tags
+  issues: write
+  pull-requests: write
+  id-token: write # npm provenance
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -20,13 +26,18 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build TypeScript
         run: npm run build
+
+      # Never publish a build that fails its tests.
+      - name: Test
+        run: npm test
 
       - name: Release
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
