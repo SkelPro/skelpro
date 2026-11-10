@@ -56,56 +56,42 @@ cd skelpro
 git checkout -b your-branch-name
 ```
 
-#### 4. Running SkelPro Locally
+#### 4. Install Dependencies
 
-To run SkelPro locally, follow these steps:
-
-- Compile the code by running: `npm run build` (recommended) or typing `tsc` in the Terminal. This will create a `build` folder.
-
-- Create a **package.json** file inside the `build` folder with the following content:
-
-```json
-{
-    "name": "skelpro",
-    "version": "1.4.2",
-    "main": "./dist/src/index.js",
-    "description": "SkelPro – where projects get their bones structured.",
-    "bin": {
-        "skelpro": "dist/cli.js"
-    },
-    "dependencies": {
-        "axios": "^1.7.9",
-        "cheerio": "^1.0.0",
-        "commander": "^13.0.0",
-        "inquirer": "^12.3.0",
-        "json5": "^2.2.3",
-        "node-fetch": "^3.3.2",
-        "ora": "^5.4.1",
-        "tonelog": "^2.0.7",
-        "typeglide": "^1.2.3"
-    },
-    "devDependencies": {
-        "@types/express": "^5.0.0",
-        "@types/inquirer": "^9.0.7",
-        "@types/node": "^22.10.5",
-        "@types/node-fetch": "^2.6.12",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.7.2"
-    }
-}
+```sh
+npm ci
 ```
+
+Use Node.js 18 or newer.
 
 #### 5. Make Your Changes
 
-Modify the code, add features, or fix bugs.  
+Modify the code, add features, or fix bugs. Add or update tests in `test/` for anything you change.
 
-#### 6. Link sklepro locally to test your changes, run:
+#### 6. Build, Test and Try It
 
 ```sh
-cd build
+npm run typecheck   # type-check the source and the tests
+npm test            # run the test suite (Vitest)
+npm run build       # compile to dist/
+```
+
+To try the CLI without building, run it from source:
+
+```sh
+npx ts-node cli.ts --help
+npx ts-node cli.ts create my-app ./template.json
+```
+
+To use your local build as the global `skelpro` command:
+
+```sh
+npm run build
 npm link
 skelpro --help
 ```
+
+Run `npm unlink -g skelpro` when you're done.
 
 #### 7. Commit Your Changes
 
@@ -145,15 +131,22 @@ git push origin feature-name
 
 #### Commit Message Format
 
-Use the following format:  
+SkelPro uses [Conventional Commits](https://www.conventionalcommits.org/). Releases are automated with semantic-release, which reads commit messages to choose the next version, so CI rejects pull requests whose commits don't follow the format:
 
 ```sh
-feat: Add support for XYZ  
-fix: Resolve bug in ABC  
-docs: Update README for clarity  
+feat: add support for XYZ          # new feature  → minor release
+fix(save): keep nested bin folders # bug fix      → patch release
+docs: update README for clarity    # no release
 ```
 
+Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Add `!` after the type (`feat!: ...`) for a breaking change.
+
 ---
+
+## Continuous Integration and Releases
+
+- Every pull request runs the type-check, build and tests on Linux, macOS and Windows with Node 18, 20 and 22. Path handling and Python venv paths differ on Windows, so please don't ignore a failure on just one OS.
+- **Releases come only from CI.** Merging to `main` runs the tests, then semantic-release bumps the version, publishes to npm with provenance, and creates the GitHub release. Never run `npm publish` from your machine: a local publish can ship code that isn't in the repository.
 
 - Ensure your branch is **up to date** with `main`.  
 - Fix any issues.  

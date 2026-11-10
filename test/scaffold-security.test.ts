@@ -54,7 +54,7 @@ describe("scaffoldJSON path safety", () => {
     const target = path.join(workDir, "proj");
     expect(() =>
       scaffoldJSON(target, { "ok.txt": "fine", "../escaped.txt": "pwned" }),
-    ).toThrow(/escapes project folder/);
+    ).toThrow(/escapes project folder|Unsafe template path/);
 
     expect(fs.existsSync(path.join(workDir, "escaped.txt"))).toBe(false);
     expect(listFiles(target)).toEqual([]);
@@ -66,7 +66,7 @@ describe("scaffoldJSON path safety", () => {
     // checked against the real root it escapes.
     expect(() =>
       scaffoldJSON(target, { src: { "../../escaped.txt": "pwned" } }),
-    ).toThrow(/escapes project folder/);
+    ).toThrow(/escapes project folder|Unsafe template path/);
 
     expect(fs.existsSync(path.join(workDir, "escaped.txt"))).toBe(false);
     expect(listFiles(target)).toEqual([]);
@@ -78,6 +78,16 @@ describe("scaffoldJSON path safety", () => {
     expect(() => scaffoldJSON(target, { "a.txt": "a", [abs]: "pwned" })).toThrow();
 
     expect(fs.existsSync(abs)).toBe(false);
+    expect(listFiles(target)).toEqual([]);
+  });
+
+  it.each([
+    ["nested absolute key", { src: { "/etc/x.txt": "pwned" } }],
+    ["nested .. that stays inside", { src: { "../moved.txt": "x" } }],
+    ["windows-style .. segment", { src: { "a\\..\\..\\x.txt": "x" } }],
+  ])("refuses a %s instead of silently relocating it", (_label, tpl) => {
+    const target = path.join(workDir, "proj");
+    expect(() => scaffoldJSON(target, tpl)).toThrow(/Unsafe template path/);
     expect(listFiles(target)).toEqual([]);
   });
 

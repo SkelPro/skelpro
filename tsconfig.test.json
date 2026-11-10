@@ -1,0 +1,10 @@
+{
+  // Type-checks the tests too. The main tsconfig excludes them so they are
+  // never compiled into dist/.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["cli.ts", "src", "test"],
+  "exclude": ["node_modules", "dist", "build"]
+}

@@ -1,5 +1,3 @@
-import { execSync } from "child_process";
-import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -7,7 +5,7 @@ import os from "os";
 import { tone, toneLevel } from "tonelog";
 
 import type { NewsTypes } from "../types/structures";
-import { PACKAGE_NAME, NEWS_URL } from "../utils/constant";
+import { NEWS_URL, VERSION } from "../utils/constant";
 
 const CACHE_FILE = path.join(os.homedir(), ".skelpro-update-cache.json");
 
@@ -43,18 +41,16 @@ function saveUpdateCache() {
   }
 }
 
-async function getInstalledVersion(): Promise<string | null> {
-  try {
-    const version = execSync("npm list -g skelpro --json", {
-      encoding: "utf-8",
-    });
-
-    const parsed = JSON.parse(version);
-
-    return parsed.dependencies?.[PACKAGE_NAME]?.version || null;
-  } catch {
-    return null;
-  }
+/**
+ * News and update notices are for humans at a terminal. Skip them for
+ * --quiet, CI, and anyone who opted out, so agent and CI output stays clean.
+ */
+export function updatesDisabled(
+  quiet?: boolean,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  const truthy = (v?: string) => v !== undefined && v !== "" && v !== "0" && v.toLowerCase() !== "false";
+  return Boolean(quiet) || truthy(env.CI) || truthy(env.NO_UPDATE_NOTIFIER);
 }
 
 async function checkNewVersion(): Promise<string | undefined> {
@@ -93,7 +89,8 @@ async function logUpdates() {
 
   const newsData = await fetchNews();
 
-  const localVersion = await getInstalledVersion();
+  // The running version; `npm list -g` was slow and wrong for npx users.
+  const localVersion = VERSION;
 
   const latestVersion = await checkNewVersion();
 
