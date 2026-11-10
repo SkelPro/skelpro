@@ -38,6 +38,10 @@ With built-in Git worktree support, SkelPro also enables developers and AI agent
 ## Features
 
 - **JSON Templates** — Define complete project structures using simple JSON files.
+- **Template Variables** — One template, many projects: `{{placeholders}}`, case helpers and optional files.
+- **Agent-Ready Projects** — Every project starts with `AGENTS.md`, pointer files and a `.skelpro.json` manifest.
+- **Structure Checks** — `skelpro check` reports drift from the layout, in CI, pre-commit hooks or by agents.
+- **MCP Server** — Coding agents (Claude, Cursor, Copilot) list templates, create projects and check structure as tool calls.
 - **Quick Scaffolding** — Generate folders and files instantly from templates.
 - **Interactive Mode** — Guided prompts for common project setup workflows.
 - **Remote Templates** — Fetch templates from online sources such as GitHub raw URLs.
@@ -85,6 +89,7 @@ SkelPro displays available actions and guides users through common workflows.
 | `skelpro info <template>` | Show a template's name, description, variables and files |
 | `skelpro init-agents [path]` | Add `AGENTS.md`, pointer files and `.skelpro.json` to an existing project |
 | `skelpro check [path]` | Check a project's structure against its layout and rules |
+| `skelpro mcp` | Start the MCP server for coding agents |
 | `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
 | `skelpro --help` | Display available commands |
 
@@ -146,6 +151,13 @@ SkelPro displays available actions and guides users through common workflows.
 |--------|-------------|
 | `-b, --branch <name>` | Also delete this branch |
 | `-f, --force` | Discard uncommitted changes and delete the branch even if unmerged |
+
+### `mcp`
+
+| Option | Description |
+|--------|-------------|
+| `--root <folder>` | Another folder the server may create projects in (repeatable) |
+| `--print-config` | Print the JSON most MCP clients need, then exit |
 
 ### Global
 
@@ -229,6 +241,23 @@ skelpro check --staged         # in a pre-commit hook
 ```
 
 Generated `AGENTS.md` files tell coding agents to run it before they finish. See [Checking a project](docs/templates.md#checking-a-project-skelpro-check), including copy-paste setup for [CI](docs/templates.md#in-ci) and [pre-commit hooks](docs/templates.md#as-a-pre-commit-hook).
+
+---
+
+## Use With AI Agents
+
+SkelPro includes an [MCP](https://modelcontextprotocol.io) server, so coding agents can use your team's templates instead of improvising boilerplate. Agents can list templates, see their variables and conventions, create projects (as a dry run first), check a project's structure, and save a project as a new template.
+
+Add it to your agent:
+
+```bash
+claude mcp add skelpro -- npx -y skelpro mcp   # Claude Code
+npx skelpro mcp --print-config                 # the JSON for Cursor, Claude Desktop and others
+```
+
+Templates come from `.skelpro/templates/` in the repository, `~/.skelpro/templates/`, and URLs you list in `~/.skelpro/config.json`. The server never fetches a URL an agent supplies, only writes inside the folder it was started in (plus any `--root`), never overwrites files unless asked, and caps template size.
+
+See [Using SkelPro with AI agents](docs/mcp.md) for setup in each client, the tools, and the safety rules.
 
 ---
 

@@ -47,13 +47,15 @@
   },
   "homepage": "https://github.com/SkelPro/skelpro#readme",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "commander": "^13.0.0",
     "ignore": "^7.0.14",
     "inquirer": "^12.3.0",
     "minimatch": "^10.2.5",
     "ora": "^5.4.1",
     "tonelog": "^2.0.7",
-    "typeglide": "^1.2.4"
+    "typeglide": "^1.2.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^13.0.1",

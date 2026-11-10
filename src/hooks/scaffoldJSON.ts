@@ -5,7 +5,7 @@ import type { JsonStructure } from "../types/structures";
 import { decodeBinary } from "../utils/files";
 import { assertSafeKey, safeJoin } from "../utils/paths";
 
-type PlannedEntry =
+export type PlannedEntry =
   | { kind: "dir"; path: string }
   | { kind: "file"; path: string; content: string | Buffer };
 
@@ -40,18 +40,20 @@ function planStructure(
   }
 }
 
-export default function scaffoldJSON(
-  dir: string,
-  structure: JsonStructure,
-): void {
-  const root = path.resolve(dir);
+/**
+ * Every folder and file a tree would create under `dir`, with each path
+ * checked (no absolute paths, no .., nothing outside the project).
+ * Throws on the first unsafe path, before anything is written.
+ */
+export function planScaffold(dir: string, structure: JsonStructure): PlannedEntry[] {
   const plan: PlannedEntry[] = [];
+  planStructure(path.resolve(dir), "", structure, plan);
+  return plan;
+}
 
-  // Validate the whole template first, so a bad template writes zero files.
-  planStructure(root, "", structure, plan);
-
-  fs.mkdirSync(root, { recursive: true });
-
+/** Writes a plan from planScaffold. */
+export function writePlan(dir: string, plan: PlannedEntry[]): void {
+  fs.mkdirSync(path.resolve(dir), { recursive: true });
   for (const entry of plan) {
     if (entry.kind === "dir") {
       fs.mkdirSync(entry.path, { recursive: true });
@@ -60,4 +62,12 @@ export default function scaffoldJSON(
       fs.writeFileSync(entry.path, entry.content);
     }
   }
+}
+
+export default function scaffoldJSON(
+  dir: string,
+  structure: JsonStructure,
+): void {
+  // Validate the whole template first, so a bad template writes zero files.
+  writePlan(dir, planScaffold(dir, structure));
 }

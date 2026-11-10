@@ -90,8 +90,9 @@ async function loadFromTemplate(
   projectDir: string,
   source: string,
   provided: Record<string, unknown>,
+  json?: unknown,
 ): Promise<LoadedConfig> {
-  const template = parseTemplate(await readTemplate(source));
+  const template = parseTemplate(json !== undefined ? json : await readTemplate(source));
   if (template.version === 1) {
     throw new Error(`${source} is a v1 template; it has no layout or rules to check against.`);
   }
@@ -129,11 +130,18 @@ async function loadFromTemplate(
 
 export async function loadCheckConfig(
   projectDir: string,
-  options: { template?: string; vars?: Record<string, unknown> } = {},
+  options: {
+    template?: string;
+    vars?: Record<string, unknown>;
+    /** An already-loaded template (the MCP server loads named templates itself, with size limits). */
+    templateJson?: unknown;
+  } = {},
 ): Promise<LoadedConfig> {
   const dir = path.resolve(projectDir);
   if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
     throw new Error(`Not a folder: ${dir}`);
   }
-  return options.template ? loadFromTemplate(dir, options.template, options.vars ?? {}) : loadManifest(dir);
+  return options.template
+    ? loadFromTemplate(dir, options.template, options.vars ?? {}, options.templateJson)
+    : loadManifest(dir);
 }

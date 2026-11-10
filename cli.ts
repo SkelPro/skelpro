@@ -284,8 +284,31 @@ program
     }
   });
 
+program
+  .command("mcp")
+  .description("Start the MCP server on stdio, for coding agents (Claude, Cursor, Copilot...)")
+  .option(
+    "--root <folder>",
+    "Another folder the server may create projects in (repeatable; the current folder is always allowed)",
+    collect,
+    [],
+  )
+  .option("--print-config", "Print the JSON most MCP clients need to run this server, then exit")
+  .action(async (opt) => {
+    if (opt.printConfig) {
+      const config = { mcpServers: { skelpro: { command: "npx", args: ["-y", "skelpro", "mcp"] } } };
+      process.stdout.write(`${JSON.stringify(config, null, 2)}\n`);
+      return;
+    }
+    // Loaded only here, so other commands don't pay for the SDK.
+    const { runStdioServer } = await import("./src/mcp/server");
+    await runStdioServer({ cwd: process.cwd(), roots: opt.root });
+  });
+
 // Runs after every command completes successfully
 program.hook("postAction", async (_program, actionCommand) => {
+  // stdout is the MCP protocol channel: never print anything after `mcp` starts.
+  if (actionCommand.name() === "mcp") return;
   // Machine-readable output must stay parseable: no banner after --json or --format json/github.
   const opts = actionCommand.opts();
   const machineReadable = opts.json || (opts.format !== undefined && opts.format !== "text");
