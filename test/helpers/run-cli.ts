@@ -1,8 +1,6 @@
-import path from "path";
+import fs from "fs";
 import { spawn } from "child_process";
-
-const ROOT = path.resolve(__dirname, "..", "..");
-const TS_NODE = path.join(ROOT, "node_modules", "ts-node", "dist", "bin.js");
+import { COMPILED_CLI } from "./paths";
 
 export interface CliResult {
   status: number | null;
@@ -11,20 +9,26 @@ export interface CliResult {
 }
 
 /**
- * Runs the real CLI from source, the way an agent or CI would: stdin is a
- * closed pipe (never a TTY) and update checks are off.
+ * Runs the real CLI the way an agent or CI would: stdin is a closed pipe
+ * (never a TTY) and update checks are off.
  *
- * Async on purpose. spawnSync blocks the Vitest worker for the few seconds
- * ts-node needs to start, and with enough CLI tests the worker misses its
- * heartbeat and Vitest fails the run with "Timeout calling onTaskUpdate".
+ * It runs the copy test/global-setup.ts compiled from the current source at
+ * the start of this test run, with plain node: starting ts-node for every
+ * command made parallel test files slow enough to time out.
+ *
+ * Async on purpose: spawnSync blocks the Vitest worker, and with enough CLI
+ * tests the worker misses its heartbeat ("Timeout calling onTaskUpdate").
  */
 export function runCli(cwd: string, args: string[], timeoutMs = 60_000): Promise<CliResult> {
+  if (!fs.existsSync(COMPILED_CLI)) {
+    return Promise.reject(new Error(`${COMPILED_CLI} is missing; run the tests with "npm test" so global setup compiles it.`));
+  }
   return new Promise((resolve, reject) => {
-    const child = spawn(
-      process.execPath,
-      [TS_NODE, "--transpile-only", path.join(ROOT, "cli.ts"), ...args],
-      { cwd, env: { ...process.env, NO_UPDATE_NOTIFIER: "1" }, stdio: ["pipe", "pipe", "pipe"] },
-    );
+    const child = spawn(process.execPath, [COMPILED_CLI, ...args], {
+      cwd,
+      env: { ...process.env, NO_UPDATE_NOTIFIER: "1" },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
     let stdout = "";
     let stderr = "";

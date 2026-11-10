@@ -136,6 +136,9 @@ SkelPro displays available actions and guides users through common workflows.
 | `--json` | Print the report as JSON |
 | `--format <format>` | `text` (default), `json` or `github` (pull request annotations) |
 | `--strict` | Fail on warnings too, not just errors |
+| `--fix` | Create missing required folders (never moves, renames or deletes) |
+| `--staged` | Only report problems in staged files (for pre-commit hooks) |
+| `--changed` | Only report problems in staged, unstaged and untracked files |
 
 ### `cleanup`
 
@@ -221,9 +224,11 @@ For a project that wasn't made with SkelPro, run `skelpro init-agents` in its fo
 skelpro check                  # exit code 0 = clean, 1 = errors, 2 = SkelPro couldn't run
 skelpro check --format github  # annotations on pull requests
 skelpro check --json           # for agents and tools
+skelpro check --fix            # create missing required folders
+skelpro check --staged         # in a pre-commit hook
 ```
 
-Generated `AGENTS.md` files tell coding agents to run it before they finish. See [Checking a project](docs/templates.md#checking-a-project-skelpro-check).
+Generated `AGENTS.md` files tell coding agents to run it before they finish. See [Checking a project](docs/templates.md#checking-a-project-skelpro-check), including copy-paste setup for [CI](docs/templates.md#in-ci) and [pre-commit hooks](docs/templates.md#as-a-pre-commit-hook).
 
 ---
 

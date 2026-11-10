@@ -9,6 +9,8 @@ import { applyInitPlan, planInitAgents } from "./src/template/init-agents";
 import { buildReport, exitCodeFor, listProjectPaths } from "./src/check/check";
 import { loadCheckConfig } from "./src/check/config";
 import { formatGithub, formatText } from "./src/check/format";
+import { fixMissingFolders } from "./src/check/fix";
+import { changedPaths, type CheckScope } from "./src/check/scope";
 import path from "path";
 
 // News and Updates...
@@ -232,6 +234,9 @@ program
   .option("--json", "Print the report as JSON")
   .option("--format <format>", "Output format: text, json or github", "text")
   .option("--strict", "Fail on warnings too, not just errors")
+  .option("--fix", "Create missing required folders (never moves, renames or deletes)")
+  .option("--staged", "Only report problems in staged files (for pre-commit hooks)")
+  .option("--changed", "Only report problems in staged, unstaged and untracked files")
   .action(async (projectPath, opt) => {
     const dir = path.resolve(projectPath ?? ".");
     const format: string = opt.json ? "json" : opt.format;
@@ -239,6 +244,9 @@ program
     try {
       if (!["text", "json", "github"].includes(format)) {
         throw new Error(`Unknown --format "${format}"; use text, json or github.`);
+      }
+      if (opt.staged && opt.changed) {
+        throw new Error("Use either --staged or --changed, not both.");
       }
       const vars: Record<string, string> = {};
       for (const pair of opt.var as string[]) {
@@ -251,7 +259,18 @@ program
       }
 
       const loaded = await loadCheckConfig(dir, { template: opt.template, vars });
-      const report = buildReport(loaded.config, listProjectPaths(dir), loaded.template);
+
+      const kind: CheckScope | undefined = opt.staged ? "staged" : opt.changed ? "changed" : undefined;
+      const scope = kind ? { kind, files: changedPaths(dir, kind) } : undefined;
+
+      let project = listProjectPaths(dir);
+      let fixed: string[] | undefined;
+      if (opt.fix) {
+        fixed = fixMissingFolders(dir, loaded.config, project);
+        project = listProjectPaths(dir); // check again, after the fix
+      }
+
+      const report = buildReport(loaded.config, project, loaded.template, { scope, fixed });
 
       if (format === "json") process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
       else if (format === "github") process.stdout.write(formatGithub(report, path.basename(dir)));

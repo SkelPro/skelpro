@@ -10,7 +10,9 @@ function title(report: CheckReport, fallbackName: string): string {
 /** "2 errors, 1 warning" (notes only when there are some). */
 export function summary(report: CheckReport): string {
   const { error, warn, info } = report.counts;
-  if (!error && !warn && !info) return `no problems found in ${plural(report.checkedFiles, "file")}`;
+  if (!error && !warn && !info) {
+    return `no problems found in ${plural(report.checkedFiles, report.scope ? `${report.scope.kind} file` : "file")}`;
+  }
   const parts = [plural(error, "error"), plural(warn, "warning")];
   if (info) parts.push(plural(info, "note"));
   return parts.join(", ");
@@ -22,7 +24,11 @@ export function summary(report: CheckReport): string {
  */
 export function formatText(report: CheckReport, fallbackName: string): string {
   const lines = [`skelpro check: ${title(report, fallbackName)} -- ${summary(report)}`];
-  if (!report.findings.length) return `${lines[0]}\n`;
+  if (report.fixed?.length) {
+    lines.push("", `Created ${report.fixed.length} missing required folder(s), each with a .gitkeep:`);
+    for (const p of report.fixed) lines.push(`  ${p}`);
+  }
+  if (!report.findings.length) return `${lines.join("\n")}\n`;
 
   const label = (f: Finding) => (f.severity === "warn" ? "warn " : f.severity === "info" ? "info " : "error");
   const pathWidth = Math.min(48, Math.max(...report.findings.map((f) => f.path.length)));

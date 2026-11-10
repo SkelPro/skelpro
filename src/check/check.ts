@@ -12,6 +12,7 @@ import { minimatch } from "minimatch";
 import { createIgnoreMatcher } from "../utils/ignore";
 import { CASE_HELPERS, type NamingStyle, type Rule, type Severity } from "../template/render";
 import type { ResolvedLayout } from "../template/agents";
+import { limitToPaths } from "./scope";
 
 export interface Finding {
   severity: Severity;
@@ -41,6 +42,16 @@ export interface CheckReport {
   findings: Finding[];
   counts: Record<Severity, number>;
   checkedFiles: number;
+  /** Set with --staged / --changed: only findings about these files are reported. */
+  scope?: { kind: "staged" | "changed"; files: string[] };
+  /** Folders created by --fix. */
+  fixed?: string[];
+}
+
+export interface ReportOptions {
+  /** Only report findings about these files (--staged / --changed). */
+  scope?: { kind: "staged" | "changed"; files: string[] };
+  fixed?: string[];
 }
 
 const GLOB = { dot: true } as const;
@@ -318,11 +329,21 @@ export function buildReport(
   config: CheckConfig,
   project: ProjectPaths,
   template?: CheckReport["template"],
+  options: ReportOptions = {},
 ): CheckReport {
-  const findings = runChecks(config, project);
+  let findings = runChecks(config, project);
+  if (options.scope) findings = limitToPaths(findings, options.scope.files);
+
   const counts: Record<Severity, number> = { error: 0, warn: 0, info: 0 };
   for (const f of findings) counts[f.severity]++;
-  return { ...(template ? { template } : {}), findings, counts, checkedFiles: project.files.length };
+  return {
+    ...(template ? { template } : {}),
+    findings,
+    counts,
+    checkedFiles: options.scope ? options.scope.files.length : project.files.length,
+    ...(options.scope ? { scope: options.scope } : {}),
+    ...(options.fixed ? { fixed: options.fixed } : {}),
+  };
 }
 
 /** 0 = clean, 1 = problems found. (2, SkelPro itself failed, is set by the caller.) */

@@ -342,6 +342,8 @@ skelpro check --template ./node-api.json   # check against a template directly
 skelpro check --json                       # machine-readable, for agents and tools
 skelpro check --format github              # inline annotations on pull requests
 skelpro check --strict                     # warnings fail too
+skelpro check --fix                        # create missing required folders
+skelpro check --staged                     # only staged files (pre-commit hooks)
 ```
 
 Example output:
@@ -378,6 +380,59 @@ For a naming problem, `check` prints the `git mv` command that would fix it, but
 | `0` | No errors. Warnings and notes don't fail the check unless you pass `--strict`. |
 | `1` | Errors found (or warnings, with `--strict`). |
 | `2` | SkelPro couldn't run the check: no `.skelpro.json`, an invalid manifest or template, or a bad option. |
+
+### Fixing problems: `--fix`
+
+`--fix` creates each missing required folder, with an empty `.gitkeep` inside so Git can commit it, then checks again and reports what's left. It never moves, renames or deletes anything: for a naming problem it prints the `git mv` that would fix it, for you (or an agent) to run.
+
+### Only what changed: `--staged` and `--changed`
+
+`--staged` reports only problems in the files `git commit` would commit, which is what a pre-commit hook needs. `--changed` also includes unstaged and untracked files. Both need a Git repository and work in a project inside a bigger repository.
+
+They limit what is *reported*, not what is looked at: an expected-companion check still sees the whole project, so an unchanged `billing.test.ts` still counts. Findings about the project as a whole, such as a missing required folder, aren't about any change and only show up in a full check.
+
+### In CI
+
+Add one step to a GitHub Actions workflow. Problems show up as annotations on the pull request, and errors fail the job:
+
+```yaml
+- name: Check project structure
+  run: npx skelpro check --format github
+```
+
+Add `--strict` to fail on warnings too.
+
+### As a pre-commit hook
+
+Pick whichever fits how the project already runs hooks.
+
+A plain Git hook, in `.git/hooks/pre-commit` (make it executable with `chmod +x`):
+
+```sh
+#!/bin/sh
+npx --no-install skelpro check --staged
+```
+
+With [Husky](https://typicode.github.io/husky/), in `.husky/pre-commit`:
+
+```sh
+npx --no-install skelpro check --staged
+```
+
+With the [pre-commit](https://pre-commit.com/) framework, in `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: skelpro-check
+        name: skelpro check
+        entry: npx --no-install skelpro check --staged
+        language: system
+        pass_filenames: false
+```
+
+`--no-install` uses the project's own copy of SkelPro (add it with `npm install --save-dev skelpro`) instead of downloading it on every commit.
 
 ### Switching a rule off for some paths
 
