@@ -38,6 +38,26 @@ describe("schema/template-v2.json", () => {
     expect(validate(docsExample()), errors()).toBe(true);
   });
 
+  it("accepts the agent-ready example in docs/templates.md", () => {
+    const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8");
+    const section = md.slice(md.indexOf("## Agent-ready templates"));
+    const example = JSON.parse(/```json\n([\s\S]*?)```/.exec(section)![1]);
+    expect(validate(example), errors()).toBe(true);
+    expect(() => parseTemplate(example)).not.toThrow();
+  });
+
+  it.each([
+    ["layout entry without purpose", { skelpro: 2, files: {}, layout: { src: {} } }],
+    ["bad naming style", { skelpro: 2, files: {}, layout: { src: { purpose: "x", naming: "Title" } } }],
+    ["layout path with ..", { skelpro: 2, files: {}, layout: { "../x": { purpose: "x" } } }],
+    ["rule with both kinds", { skelpro: 2, files: {}, rules: [{ id: "a", forbid: "x", match: "y", expect: "z" }] }],
+    ["rule without id", { skelpro: 2, files: {}, rules: [{ forbid: "x" }] }],
+    ["pointer to AGENTS.md", { skelpro: 2, files: {}, agents: { pointerFiles: ["AGENTS.md"] } }],
+    ["unknown agents field", { skelpro: 2, files: {}, agents: { run: "x" } }],
+  ])("rejects %s", (_label, template) => {
+    expect(validate(template)).toBe(false);
+  });
+
   it("agrees with the renderer on the docs example", () => {
     expect(() => parseTemplate(docsExample())).not.toThrow();
   });

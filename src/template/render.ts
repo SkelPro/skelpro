@@ -32,15 +32,44 @@ export interface FileTree {
   [name: string]: string | ConditionalFile | FileTree;
 }
 
+export const NAMING_STYLES = ["kebab-case", "camelCase", "PascalCase", "snake_case", "UPPER_CASE"] as const;
+export type NamingStyle = (typeof NAMING_STYLES)[number];
+export type Severity = "error" | "warn" | "info";
+
+/** What one folder is for, and the rules that apply to it. */
+export interface LayoutEntry {
+  purpose: string;
+  naming?: NamingStyle;
+  required?: boolean;
+  $when?: string;
+}
+
+/** A structure rule `skelpro check` enforces (Feature 4). */
+export type Rule =
+  | { id: string; match: string; expect: string; severity: Severity }
+  | { id: string; forbid: string; except?: string[]; severity: Severity };
+
+export interface AgentsConfig {
+  /** Conventions written into AGENTS.md. */
+  instructions?: string;
+  /** Files such as CLAUDE.md that just point to AGENTS.md. */
+  pointerFiles?: string[];
+}
+
 export interface ParsedTemplate {
   version: 1 | 2;
   name?: string;
   description?: string;
+  /** The template's own version, e.g. "1.2.0" (v2 only). */
+  templateVersion?: string;
   variables: Record<string, VariableDef>;
   files: FileTree;
   /** v1 `worktree: true` flag, or the v2 envelope field. */
   worktree: boolean;
-  /** The raw v2 envelope, for fields later features read (layout, rules, agents). */
+  layout: Record<string, LayoutEntry>;
+  rules: Rule[];
+  agents?: AgentsConfig;
+  /** The raw envelope (v2) or tree (v1). */
   raw: Record<string, unknown>;
 }
 
@@ -262,7 +291,15 @@ export function parseTemplate(json: unknown): ParsedTemplate {
       if (typeof value === "string" || isPlainObject(value)) files[key] = value as FileTree[string];
     }
     if (worktree !== true && isPlainObject(worktree)) files.worktree = worktree as FileTree;
-    return { version: 1, variables: {}, files, worktree: worktree === true, raw: json };
+    return {
+      version: 1,
+      variables: {},
+      files,
+      worktree: worktree === true,
+      layout: {},
+      rules: [],
+      raw: json,
+    };
   }
 
   if (json.skelpro !== 2) {
@@ -283,18 +320,138 @@ export function parseTemplate(json: unknown): ParsedTemplate {
     variables[name] = validateVariableDef(name, def);
   }
 
+  if (json.version !== undefined && typeof json.version !== "string") {
+    throw new TemplateError("invalid_template", '"version" must be a string, such as "1.0.0".');
+  }
+
   const template: ParsedTemplate = {
     version: 2,
     name: typeof json.name === "string" ? json.name : undefined,
     description: typeof json.description === "string" ? json.description : undefined,
+    templateVersion: json.version as string | undefined,
     variables,
     files: json.files as FileTree,
     worktree: json.worktree === true,
+    layout: parseLayout(json.layout),
+    rules: parseRules(json.rules),
+    agents: parseAgents(json.agents),
     raw: json,
   };
 
   checkReferences(template);
   return template;
+}
+
+// ---------------------------------------------------------------- layout, rules, agents
+
+const invalid = (message: string) => new TemplateError("invalid_template", message);
+
+/** Layout paths and pointer files are relative paths inside the project. */
+export function assertRelativePath(p: string, where: string): void {
+  if (!p || /^[\\/]/.test(p) || /^[A-Za-z]:/.test(p) || p.split(/[\\/]+/).includes("..") || p.includes("\0")) {
+    throw invalid(`${where}: "${p}" must be a relative path inside the project.`);
+  }
+}
+
+function parseLayout(raw: unknown): Record<string, LayoutEntry> {
+  if (raw === undefined) return {};
+  if (!isPlainObject(raw)) throw invalid('"layout" must be an object of path: { purpose, ... }.');
+
+  const layout: Record<string, LayoutEntry> = {};
+  for (const [p, entry] of Object.entries(raw)) {
+    const where = `layout "${p}"`;
+    assertRelativePath(p, "layout");
+    if (!isPlainObject(entry)) throw invalid(`${where} must be an object with a "purpose".`);
+
+    const extra = Object.keys(entry).filter((k) => !["purpose", "naming", "required", "$when"].includes(k));
+    if (extra.length) throw invalid(`${where}: unknown field${extra.length > 1 ? "s" : ""} ${extra.join(", ")}.`);
+    if (typeof entry.purpose !== "string" || !entry.purpose.trim()) {
+      throw invalid(`${where} needs a "purpose" describing what the folder is for.`);
+    }
+    if (entry.naming !== undefined && !NAMING_STYLES.includes(entry.naming as NamingStyle)) {
+      throw invalid(`${where}: "naming" must be one of ${NAMING_STYLES.join(", ")}.`);
+    }
+    if (entry.required !== undefined && typeof entry.required !== "boolean") {
+      throw invalid(`${where}: "required" must be true or false.`);
+    }
+    if (entry.$when !== undefined) parseCondition(entry.$when as string, where);
+    layout[p] = entry as unknown as LayoutEntry;
+  }
+  return layout;
+}
+
+const RULE_ID = /^[a-z0-9][a-z0-9-]*$/;
+const SEVERITIES: Severity[] = ["error", "warn", "info"];
+
+function parseRules(raw: unknown): Rule[] {
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) throw invalid('"rules" must be a list.');
+
+  const seen = new Set<string>();
+  return raw.map((rule, i) => {
+    const where = `rules[${i}]`;
+    if (!isPlainObject(rule)) throw invalid(`${where} must be an object.`);
+    if (typeof rule.id !== "string" || !RULE_ID.test(rule.id)) {
+      throw invalid(`${where} needs an "id" in kebab-case, such as "no-root-scripts".`);
+    }
+    if (seen.has(rule.id)) throw invalid(`Two rules have the id "${rule.id}".`);
+    seen.add(rule.id);
+
+    if (rule.severity !== undefined && !SEVERITIES.includes(rule.severity as Severity)) {
+      throw invalid(`Rule "${rule.id}": "severity" must be error, warn or info.`);
+    }
+    const str = (k: string) => typeof rule[k] === "string" && (rule[k] as string).length > 0;
+
+    if ("forbid" in rule) {
+      const extra = Object.keys(rule).filter((k) => !["id", "forbid", "except", "severity"].includes(k));
+      if (extra.length || !str("forbid")) {
+        throw invalid(`Rule "${rule.id}": a forbid rule has "forbid" (a glob) and optional "except" and "severity".`);
+      }
+      if (rule.except !== undefined && !(Array.isArray(rule.except) && rule.except.every((e) => typeof e === "string"))) {
+        throw invalid(`Rule "${rule.id}": "except" must be a list of globs.`);
+      }
+      return {
+        id: rule.id,
+        forbid: rule.forbid as string,
+        ...(rule.except ? { except: rule.except as string[] } : {}),
+        severity: (rule.severity as Severity) ?? "error",
+      };
+    }
+
+    const extra = Object.keys(rule).filter((k) => !["id", "match", "expect", "severity"].includes(k));
+    if (extra.length || !str("match") || !str("expect")) {
+      throw invalid(
+        `Rule "${rule.id}" needs either "match" and "expect" (globs), or "forbid".`,
+      );
+    }
+    return {
+      id: rule.id,
+      match: rule.match as string,
+      expect: rule.expect as string,
+      severity: (rule.severity as Severity) ?? "warn",
+    };
+  });
+}
+
+function parseAgents(raw: unknown): AgentsConfig | undefined {
+  if (raw === undefined) return undefined;
+  if (!isPlainObject(raw)) throw invalid('"agents" must be an object.');
+
+  const extra = Object.keys(raw).filter((k) => !["instructions", "pointerFiles"].includes(k));
+  if (extra.length) throw invalid(`"agents": unknown field${extra.length > 1 ? "s" : ""} ${extra.join(", ")}.`);
+  if (raw.instructions !== undefined && typeof raw.instructions !== "string") {
+    throw invalid('"agents.instructions" must be a string.');
+  }
+  if (raw.pointerFiles !== undefined) {
+    if (!Array.isArray(raw.pointerFiles) || !raw.pointerFiles.every((p) => typeof p === "string")) {
+      throw invalid('"agents.pointerFiles" must be a list of file paths, such as ["CLAUDE.md"].');
+    }
+    for (const p of raw.pointerFiles as string[]) {
+      assertRelativePath(p, "agents.pointerFiles");
+      if (p.replace(/^\.\//, "") === "AGENTS.md") throw invalid('"agents.pointerFiles" can\'t include AGENTS.md itself.');
+    }
+  }
+  return raw as AgentsConfig;
 }
 
 /**
@@ -346,6 +503,30 @@ function checkReferences(template: ParsedTemplate): void {
   };
 
   walk(template.files, "");
+
+  if (".skelpro.json" in template.files) {
+    throw new TemplateError(
+      "invalid_template",
+      '".skelpro.json" is generated by SkelPro; remove it from "files" (use "layout" and "rules" instead).',
+    );
+  }
+
+  for (const [p, entry] of Object.entries(template.layout)) {
+    const where = `layout "${p}"`;
+    check(placeholdersIn(p, where), where);
+    check(placeholdersIn(entry.purpose, where), where);
+    if (entry.$when !== undefined) check([parseCondition(entry.$when, where).name], `$when at ${where}`);
+  }
+
+  for (const rule of template.rules) {
+    const where = `rule "${rule.id}"`;
+    const globs = "forbid" in rule ? [rule.forbid, ...(rule.except ?? [])] : [rule.match, rule.expect];
+    for (const glob of globs) check(placeholdersIn(glob, where), where);
+  }
+
+  if (template.agents?.instructions) {
+    check(placeholdersIn(template.agents.instructions, "agents.instructions"), "agents.instructions");
+  }
 }
 
 // ---------------------------------------------------------------- variables

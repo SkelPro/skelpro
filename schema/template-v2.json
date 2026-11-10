@@ -27,6 +27,40 @@
       "type": "boolean",
       "description": "Always create the project as a Git worktree (same as `create --worktree`)."
     },
+    "version": {
+      "type": "string",
+      "description": "The template's own version, such as \"1.2.0\". Recorded in the generated .skelpro.json."
+    },
+    "layout": {
+      "type": "object",
+      "description": "What each folder is for. Written into AGENTS.md as the \"Project layout\" section, recorded in .skelpro.json, and used by `skelpro check`.",
+      "propertyNames": { "$ref": "#/$defs/relativePath" },
+      "additionalProperties": { "$ref": "#/$defs/layoutEntry" }
+    },
+    "rules": {
+      "type": "array",
+      "description": "Structure rules for `skelpro check`, recorded in .skelpro.json.",
+      "items": { "$ref": "#/$defs/rule" }
+    },
+    "agents": {
+      "type": "object",
+      "description": "Instructions for coding agents, written into the generated AGENTS.md.",
+      "additionalProperties": false,
+      "properties": {
+        "instructions": {
+          "type": "string",
+          "description": "Conventions for agents, such as how to run tests. May use {{placeholders}}."
+        },
+        "pointerFiles": {
+          "type": "array",
+          "description": "Files that just point to AGENTS.md, for tools that read their own file (for example CLAUDE.md).",
+          "items": {
+            "allOf": [{ "$ref": "#/$defs/relativePath" }, { "not": { "pattern": "^(\\./)?AGENTS\\.md$" } }]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
     "variables": {
       "type": "object",
       "description": "Values the template asks for. Use them as {{name}} in file contents and names. `projectName`, `year` and `date` are always available.",
@@ -41,6 +75,76 @@
     }
   },
   "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "A path inside the project. Absolute paths and .. segments are refused.",
+      "not": {
+        "anyOf": [
+          { "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)" },
+          { "pattern": "^[\\\\/]" },
+          { "pattern": "^[A-Za-z]:" }
+        ]
+      }
+    },
+    "layoutEntry": {
+      "type": "object",
+      "required": ["purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the folder is for, in one line. May use {{placeholders}}."
+        },
+        "naming": {
+          "enum": ["kebab-case", "camelCase", "PascalCase", "snake_case", "UPPER_CASE"],
+          "description": "Naming convention for files in this folder."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "The folder must exist."
+        },
+        "$when": { "$ref": "#/$defs/condition" }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Kebab-case rule name, shown in `skelpro check` output."
+        },
+        "severity": {
+          "enum": ["error", "warn", "info"],
+          "description": "Defaults to error for forbid rules and warn for match/expect rules."
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["match", "expect"],
+          "properties": {
+            "id": true,
+            "severity": true,
+            "match": { "type": "string", "minLength": 1, "description": "Glob of files the rule applies to." },
+            "expect": { "type": "string", "minLength": 1, "description": "Glob of the companion file each match should have." }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": ["forbid"],
+          "properties": {
+            "id": true,
+            "severity": true,
+            "forbid": { "type": "string", "minLength": 1, "description": "Glob of files that must not exist." },
+            "except": { "type": "array", "items": { "type": "string" }, "description": "Globs allowed despite forbid." }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
     "variable": {
       "type": "object",
       "required": ["type"],

@@ -83,6 +83,7 @@ SkelPro displays available actions and guides users through common workflows.
 | `skelpro save <name> <path>` | Save an existing project as a reusable JSON template |
 | `skelpro create <project> <template>` | Generate a project from a template |
 | `skelpro info <template>` | Show a template's name, description, variables and files |
+| `skelpro init-agents [path]` | Add `AGENTS.md`, pointer files and `.skelpro.json` to an existing project |
 | `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
 | `skelpro --help` | Display available commands |
 
@@ -115,6 +116,15 @@ SkelPro displays available actions and guides users through common workflows.
 | Option | Description |
 |--------|-------------|
 | `--json` | Print machine-readable JSON |
+
+### `init-agents`
+
+| Option | Description |
+|--------|-------------|
+| `--pointer <file>` | Pointer file linking to `AGENTS.md` (repeatable; default `CLAUDE.md`) |
+| `--no-pointers` | Don't add any pointer files |
+| `--dry-run` | Show what would change without writing anything |
+| `-f, --force` | Regenerate an existing `.skelpro.json` |
 
 ### `cleanup`
 
@@ -179,6 +189,18 @@ skelpro save node-api ./my-api --var projectName=my-api --var port=3000
 `my-api` (and variants such as `MyApi`) becomes `{{projectName}}` everywhere, and SkelPro prints every replacement so you can check it.
 
 Templates without variables keep working exactly as before. See the [template reference](docs/templates.md) for the full format: variable types, case helpers, optional files with `$when`, escaping, and the JSON Schema for editor autocomplete.
+
+### Agent-Ready Templates
+
+A v2 template can describe what each folder is for (`layout`), structure rules (`rules`) and instructions for coding agents (`agents`). Every project created from it then starts with:
+
+- **`AGENTS.md`**: the template's instructions plus a generated "Project layout" section that coding agents read.
+- **Pointer files** such as `CLAUDE.md`: one line linking to `AGENTS.md`, for tools that read their own file.
+- **`.skelpro.json`**: a manifest of the template, the variable values used, and the layout and rules.
+
+See [Agent-ready templates](docs/templates.md#agent-ready-templates) for the format.
+
+For a project that wasn't made with SkelPro, run `skelpro init-agents` in its folder. It adds the same three files, with a starting layout guessed from the folders that exist and a TODO for each one to fill in. It never overwrites an existing `AGENTS.md` or pointer file; use `--dry-run` to preview. See [Existing projects](docs/templates.md#existing-projects-skelpro-init-agents).
 
 ---
 

@@ -11,6 +11,8 @@ import {
 } from "./template/render";
 import { askForVariables, canPrompt } from "./template/prompt";
 import { reverseTemplate } from "./template/reverse";
+import { addAgentFiles } from "./template/agents";
+import { VERSION } from "./utils/constant";
 
 import createJSON from "./hooks/createJSON";
 import scaffoldJSON from "./hooks/scaffoldJSON";
@@ -162,6 +164,7 @@ function collectProvidedVariables(options: TemplateOptions): Record<string, unkn
 /** Parses, resolves variables, renders, scaffolds, then optionally installs. */
 async function buildProject(
   json: unknown,
+  source: string,
   baseName: string,
   install: boolean,
   useWorktree: boolean,
@@ -182,7 +185,11 @@ async function buildProject(
     provided,
     ask: canPrompt(options.yes) ? askForVariables : undefined,
   });
-  const files = renderTemplate(template, vars);
+  const files = addAgentFiles(template, vars, renderTemplate(template, vars), {
+    source,
+    projectDir: path.resolve(baseName),
+    skelproVersion: VERSION,
+  });
 
   if (template.worktree) {
     useWorktree = true;
@@ -217,7 +224,7 @@ async function scaffoldTemplate(
   options: TemplateOptions = {},
 ) {
   const json = await loadTemplateJSON(source);
-  await buildProject(json, baseName, install, useWorktree, branchName, options);
+  await buildProject(json, source, baseName, install, useWorktree, branchName, options);
 }
 
 /** Kept for the interactive menu; same as scaffoldTemplate with a URL. */
@@ -239,8 +246,13 @@ export interface TemplateInfo {
   version: 1 | 2;
   name?: string;
   description?: string;
+  templateVersion?: string;
   variables: ParsedTemplate["variables"];
   files: string[];
+  layout: ParsedTemplate["layout"];
+  rules: ParsedTemplate["rules"];
+  agents?: ParsedTemplate["agents"];
+  /** True if the generated project will have an AGENTS.md. */
   hasAgentsFile: boolean;
 }
 
@@ -252,9 +264,16 @@ async function describeTemplate(source: string): Promise<TemplateInfo> {
     version: template.version,
     name: template.name,
     description: template.description,
+    templateVersion: template.templateVersion,
     variables: template.variables,
     files,
-    hasAgentsFile: files.some((f) => f === "AGENTS.md"),
+    layout: template.layout,
+    rules: template.rules,
+    agents: template.agents,
+    hasAgentsFile:
+      files.includes("AGENTS.md") ||
+      Object.keys(template.layout).length > 0 ||
+      Boolean(template.agents?.instructions),
   };
 }
 

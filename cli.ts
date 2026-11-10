@@ -5,6 +5,7 @@ import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
 import { createTemplate, scaffoldTemplate, describeTemplate } from "./src/actions";
 import { cleanupWorktree } from "./src/hooks/cleanupWorktree";
+import { applyInitPlan, planInitAgents } from "./src/template/init-agents";
 
 // News and Updates...
 import logUpdates, { updatesDisabled } from "./src/hooks/logUpdates";
@@ -139,6 +140,79 @@ program
     console.log(`\nFiles (${info.files.length})`);
     for (const file of info.files.slice(0, 50)) console.log(`  ${file}`);
     if (info.files.length > 50) console.log(`  ...and ${info.files.length - 50} more`);
+
+    const layout = Object.entries(info.layout);
+    if (layout.length) {
+      console.log(`\nLayout (${layout.length})`);
+      for (const [p, entry] of layout) {
+        const notes = [entry.naming, entry.required ? "required" : "", entry.$when ? `when ${entry.$when}` : ""]
+          .filter(Boolean)
+          .join(", ");
+        console.log(`  ${p}/  ${entry.purpose}${notes ? `  [${notes}]` : ""}`);
+      }
+    }
+
+    if (info.rules.length) {
+      console.log(`\nRules (${info.rules.length})`);
+      for (const rule of info.rules) {
+        const what = "forbid" in rule ? `forbid ${rule.forbid}` : `${rule.match} expects ${rule.expect}`;
+        console.log(`  ${rule.id}  ${what}  [${rule.severity}]`);
+      }
+    }
+
+    if (info.version === 2) {
+      const agentFiles = [
+        ...(info.hasAgentsFile ? ["AGENTS.md", ...(info.agents?.pointerFiles ?? [])] : []),
+        ".skelpro.json",
+      ];
+      console.log(`\nGenerated for agents: ${agentFiles.join(", ")}`);
+    }
+  });
+
+program
+  .command("init-agents [projectPath]")
+  .description(
+    "Add AGENTS.md, pointer files and .skelpro.json to an existing project",
+  )
+  .option(
+    "--pointer <file>",
+    "Pointer file to add, linking to AGENTS.md (repeatable; default CLAUDE.md)",
+    collect,
+    [],
+  )
+  .option("--no-pointers", "Don't add any pointer files")
+  .option("--dry-run", "Show what would change without writing anything")
+  .option("-f, --force", "Regenerate an existing .skelpro.json")
+  .action((projectPath, opt) => {
+    const pointerFiles = opt.pointers
+      ? opt.pointer.length
+        ? opt.pointer
+        : ["CLAUDE.md"]
+      : [];
+
+    const plan = planInitAgents(projectPath ?? ".", {
+      pointerFiles,
+      force: Boolean(opt.force),
+      skelproVersion: VERSION,
+    });
+
+    const verb = { create: "create", append: "update", replace: "replace", skip: "skip" } as const;
+    console.log(opt.dryRun ? "Dry run, nothing written:" : `Setting up ${plan.root} for coding agents:`);
+    for (const change of plan.changes) {
+      const why = change.action === "skip" ? ` (${change.reason})` : "";
+      console.log(`  ${verb[change.action].padEnd(7)} ${change.path}${why}`);
+    }
+
+    if (opt.dryRun) return;
+    applyInitPlan(plan);
+
+    const touched = plan.changes.filter((c) => c.action !== "skip").map((c) => c.path);
+    const withTodos = touched.filter((p) => p === "AGENTS.md" || p === ".skelpro.json");
+    console.log(
+      withTodos.length
+        ? `\nNext: replace the TODOs in ${withTodos.join(" and ")} with what each folder is for, then commit.`
+        : "\nNothing to add.",
+    );
   });
 
 // Runs after every command completes successfully

@@ -46,6 +46,10 @@ A template is v2 when it has `"skelpro": 2`. Anything without a `skelpro` key is
 | `description` | no | Shown by `skelpro info`. |
 | `variables` | no | Values the template asks for. |
 | `worktree` | no | `true` always creates the project as a Git worktree. |
+| `version` | no | The template's own version (such as `"1.2.0"`), recorded in `.skelpro.json`. |
+| `layout` | no | What each folder is for. See [Agent-ready templates](#agent-ready-templates). |
+| `rules` | no | Structure rules for `skelpro check`. See [Agent-ready templates](#agent-ready-templates). |
+| `agents` | no | Instructions for coding agents. See [Agent-ready templates](#agent-ready-templates). |
 | `$schema` | no | Link to the JSON Schema, for editor autocomplete and checking. |
 
 ## Files
@@ -172,6 +176,156 @@ Every occurrence of each value is replaced with a placeholder, in file contents 
 - The `variables` block is written for you. Each value becomes the default, except `projectName`, which defaults to the name given to `create`.
 
 `save` prints how many replacements it made for each variable and in which files. **Read it**: a short or common value (such as `api`) can match more than you intended. Booleans can't be substituted this way, since every `true` in the project would change; add boolean variables and `$when` blocks by hand.
+
+## Agent-ready templates
+
+Coding agents work better when a project tells them its conventions. A v2 template can describe its layout and give agents instructions, and SkelPro writes them into every project it creates:
+
+```
+my-api/
+├── AGENTS.md        # instructions + a generated "Project layout" section
+├── CLAUDE.md        # one line pointing to AGENTS.md (optional)
+├── .skelpro.json    # manifest: template, variables, layout and rules
+└── ...project files
+```
+
+[AGENTS.md](https://agents.md) is a plain-markdown convention that many coding agents read. Some tools read their own file instead (such as `CLAUDE.md`), so a template can list **pointer files**: one-line files that link to `AGENTS.md` rather than repeating it.
+
+### Example
+
+```json
+{
+  "skelpro": 2,
+  "name": "node-api",
+  "version": "1.0.0",
+  "variables": {
+    "database": { "type": "enum", "options": ["none", "postgres"], "default": "none" }
+  },
+  "files": {
+    "src": { "routes": {}, "services": {}, "index.ts": "" },
+    "tests": {}
+  },
+  "layout": {
+    "src/routes": { "purpose": "HTTP route handlers, one file per resource", "naming": "kebab-case" },
+    "src/services": { "purpose": "Business logic; no HTTP or database imports" },
+    "src/db": { "purpose": "Database client and queries only", "$when": "database != 'none'" },
+    "tests": { "purpose": "Integration tests", "required": true }
+  },
+  "rules": [
+    { "id": "colocated-unit-tests", "match": "src/**/*.ts", "expect": "src/**/*.test.ts", "severity": "warn" },
+    { "id": "no-root-scripts", "forbid": "*.js", "except": ["*.config.js"], "severity": "error" }
+  ],
+  "agents": {
+    "instructions": "Use pnpm. Run `pnpm test` before finishing. Never edit generated files in src/gen.",
+    "pointerFiles": ["CLAUDE.md"]
+  }
+}
+```
+
+With the default `database` of `none`, `skelpro create my-api` writes this `AGENTS.md`:
+
+```markdown
+# my-api
+
+Use pnpm. Run `pnpm test` before finishing. Never edit generated files in src/gen.
+
+## Project layout
+
+- `src/routes/`: HTTP route handlers, one file per resource (kebab-case names)
+- `src/services/`: business logic; no HTTP or database imports
+- `tests/`: integration tests (required)
+```
+
+`src/db` is left out because its `$when` is false. With `--var database=postgres` it would be listed too.
+
+### `layout`
+
+Keys are folder paths. Each entry has:
+
+| Field | Required | Meaning |
+|---|---|---|
+| `purpose` | yes | What the folder is for, in one line. |
+| `naming` | no | File naming convention: `kebab-case`, `camelCase`, `PascalCase`, `snake_case` or `UPPER_CASE`. |
+| `required` | no | `true` if the folder must exist. |
+| `$when` | no | Only include this entry when the condition holds (same syntax as for files). |
+
+Paths and purposes can use `{{placeholders}}`. The layout is the single source of truth: SkelPro writes it into `AGENTS.md` and records it in `.skelpro.json`, and `skelpro check` (coming in a later release) checks projects against it, so the docs and the checks can't disagree.
+
+### `rules`
+
+Rules describe structure that `skelpro check` will enforce. There are two kinds:
+
+| Kind | Fields | Example |
+|---|---|---|
+| Expected companion | `match`, `expect` | every `src/**/*.ts` should have a `src/**/*.test.ts` |
+| Forbidden files | `forbid`, optional `except` | no `*.js` in the root, except `*.config.js` |
+
+Every rule needs a kebab-case `id`. `severity` is `error`, `warn` or `info`; it defaults to `error` for forbid rules and `warn` for the others. Rules are validated and recorded in `.skelpro.json` today; checking them arrives with `skelpro check`.
+
+### `agents`
+
+| Field | Meaning |
+|---|---|
+| `instructions` | Conventions for agents, written near the top of `AGENTS.md`. May use `{{placeholders}}`. |
+| `pointerFiles` | Files to create that point to `AGENTS.md`, such as `["CLAUDE.md"]`. Each contains one line with a link that works from its folder. |
+
+### Writing your own `AGENTS.md`
+
+A template can include an `AGENTS.md` in `files`. SkelPro keeps its content, adds `instructions` after it, and appends the generated layout section at the end. To put the layout somewhere else, add this line where it should go:
+
+```markdown
+<!-- skelpro:layout -->
+```
+
+If the template also contains a file listed in `pointerFiles`, the template's own file is kept.
+
+### The `.skelpro.json` manifest
+
+Every project created from a v2 template gets a `.skelpro.json`. It records:
+
+- the template's `name`, `version` and `source` (a path relative to the project, or the URL without any query string, so access tokens aren't committed),
+- the SkelPro version and the date it was created,
+- the values used for the template's variables,
+- the resolved `layout` and `rules`, with `$when` and placeholders applied.
+
+This lets `skelpro check` work months later without the original template. Commit it with the project. Templates can't include their own `.skelpro.json`; it's always generated.
+
+v1 templates don't get any of these files, so they keep producing exactly what they contain.
+
+### Existing projects: `skelpro init-agents`
+
+Most work happens in projects that weren't made with SkelPro. `init-agents` adds the same files to them:
+
+```bash
+skelpro init-agents                      # in the project folder; adds AGENTS.md, CLAUDE.md, .skelpro.json
+skelpro init-agents ./shop-api --dry-run # show what would change, write nothing
+skelpro init-agents --pointer GEMINI.md --pointer .cursor/rules/agents.mdc
+skelpro init-agents --no-pointers        # only AGENTS.md and .skelpro.json
+```
+
+It infers a starting layout from the folders that exist: every top-level folder, plus one level inside `src`, `app`, `lib`, `packages`, `apps` and `services`. Folders that `save` would skip (`node_modules`, build output, anything in `.gitignore`) and hidden folders are left out. Each purpose is written as `TODO: describe what belongs here`, and the instructions as a TODO too, for you to replace:
+
+```markdown
+# shop-api
+
+TODO: describe how to build, test and run this project, and any conventions agents must follow.
+
+## Project layout
+
+- `src/`: TODO: describe what belongs here
+- `src/routes/`: TODO: describe what belongs here
+- `tests/`: TODO: describe what belongs here
+```
+
+It never overwrites your work:
+
+| Already there | What happens |
+|---|---|
+| `AGENTS.md` | Kept. The layout section is appended (or put at a `<!-- skelpro:layout -->` marker), unless it already has a `## Project layout` section, in which case it's left alone. |
+| A pointer file | Left alone. |
+| `.skelpro.json` | The command stops: the project is already set up. `--force` regenerates the manifest only. |
+
+The purposes live in both `AGENTS.md` and `.skelpro.json`; fill in both before committing.
 
 ## Editor support
 
