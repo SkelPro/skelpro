@@ -90,7 +90,8 @@ SkelPro displays available actions and guides users through common workflows.
 | `skelpro init-agents [path]` | Add `AGENTS.md`, pointer files and `.skelpro.json` to an existing project |
 | `skelpro check [path]` | Check a project's structure against its layout and rules |
 | `skelpro mcp` | Start the MCP server for coding agents |
-| `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
+| `skelpro agents spawn\|list\|cleanup` | Isolated Git worktrees for coding agents, one per task |
+| `skelpro cleanup <repoPath> <worktreePath>` | Remove a worktree made by `create --worktree` (deprecated) |
 | `skelpro --help` | Display available commands |
 
 ---
@@ -105,7 +106,7 @@ SkelPro displays available actions and guides users through common workflows.
 | `--vars <file>` | Read template variables from a JSON file |
 | `-y, --yes` | Use defaults and never prompt; missing variables are an error |
 | `-i, --install` | Install dependencies after scaffolding |
-| `-w, --worktree` | Create an isolated Git worktree environment |
+| `-w, --worktree` | Create as a new repository with a worktree (deprecated; use `skelpro agents spawn`) |
 | `-b, --branch <name>` | Specify the Git branch name for a worktree |
 
 ### `save`
@@ -151,6 +152,24 @@ SkelPro displays available actions and guides users through common workflows.
 |--------|-------------|
 | `-b, --branch <name>` | Also delete this branch |
 | `-f, --force` | Discard uncommitted changes and delete the branch even if unmerged |
+
+### `agents spawn`
+
+| Option | Description |
+|--------|-------------|
+| `--from <ref>` | Branch, tag or commit to start from (default: the current branch) |
+| `--count <n>` | Create n numbered worktrees for parallel attempts |
+| `--prefix <prefix>` | Name prefix for `--count` (default `try`) |
+| `--scaffold <template>` | Add a feature skeleton from a named template |
+| `--var <name=value>` | Template variable for `--scaffold` (repeatable) |
+| `-i, --install` | Install dependencies in each worktree |
+
+### `agents cleanup`
+
+| Option | Description |
+|--------|-------------|
+| `--merged` | Remove every agent worktree whose branch has nothing unmerged |
+| `-f, --force` | Discard uncommitted changes and delete unmerged branches |
 
 ### `mcp`
 
@@ -263,66 +282,53 @@ See [Using SkelPro with AI agents](docs/mcp.md) for setup in each client, the to
 
 ## Git Worktrees for AI Agents
 
-SkelPro supports Git worktrees for creating isolated environments for AI agents and parallel development.
-
-When a worktree is created, SkelPro:
-
-1. Creates the project structure.
-2. Initializes a Git repository.
-3. Creates the requested branch.
-4. Creates a separate worktree environment.
-
-### Creating a Worktree
+`skelpro agents` gives each coding agent (or each task) its own isolated Git worktree in an existing repository, on its own branch, optionally with a feature skeleton from a template, set up the same way every time.
 
 ```bash
-skelpro create backend-agent ./template.json --worktree --branch agent-backend-fix
+# One worktree per task, each on its own branch from main
+skelpro agents spawn invoices-api auth-refactor --from main
+
+# Three numbered worktrees for parallel attempts at the same task
+skelpro agents spawn --count 3 --prefix try --from main
+
+# A worktree plus a feature skeleton from a template
+skelpro agents spawn invoices-api --scaffold feature-module --var featureName=invoices
+
+skelpro agents list                      # name, branch, base, commits ahead, uncommitted changes
+skelpro agents cleanup invoices-api      # remove the worktree and its branch
+skelpro agents cleanup --merged          # remove every agent worktree with nothing unmerged
 ```
 
-This creates:
+Example `list` output:
 
 ```
-backend-agent/
-├── .git/
-└── project files
-
-backend-agent-agent-backend-fix/
-└── isolated worktree
+NAME           BRANCH               BASE  AHEAD  CHANGES  PATH
+auth-refactor  agent/auth-refactor  main  1      3 files  ../myrepo.agents/auth-refactor
+invoices-api   agent/invoices-api   main  4      clean    ../myrepo.agents/invoices-api
 ```
 
-Each worktree has its own Git branch, allowing multiple agents or developers to work independently.
+How it works:
 
-### Removing a Worktree
+- **Location:** worktrees go in a sibling folder, `../<repo>.agents/<name>`, so they never show up inside the repository or its search results.
+- **Branches:** `agent/<name>`, validated with `git check-ref-format`.
+- **Per-worktree setup:** `--install` installs dependencies. `--scaffold <template>` adds files from a named template (from `.skelpro/templates/`, `~/.skelpro/templates/` or your configured remote templates).
+- **Untracked files:** worktrees start without untracked files such as `.env.local`. List the ones agents need in `.skelpro/config.json` (shared with the team) or `~/.skelpro/config.json`, and they're copied into each new worktree. `dir` changes where worktrees go:
 
-Once the work is complete, remove the worktree and clean up associated Git references:
-
-#### Syntax
-
-```bash
-skelpro cleanup <repoPath> <worktreePath> --branch <branchName>
+```json
+{ "agents": { "copy": [".env.local"], "dir": "../my-agents" } }
 ```
 
-#### Usage Example
+- **Tracking:** spawned worktrees are recorded in `.git/skelpro-agents.json` (inside `.git`, so never committed). `list` and `cleanup` only touch worktrees SkelPro created.
 
-```bash
-skelpro cleanup ./backend-agent ./backend-agent-agent-backend-fix --branch agent-backend-fix
-```
+Safety:
 
-This will:
+- `cleanup` refuses a worktree with uncommitted changes, and refuses to delete a branch with commits that aren't in its base. Both need `--force`, and the message says exactly what would be lost. It exits with code 1 when it keeps anything.
+- It never deletes a folder that Git doesn't list as one of its worktrees.
+- Every Git command runs with argument arrays, never through a shell.
 
-- Remove the Git worktree at `./backend-agent-agent-backend-fix`
-- Clean stale Git worktree references from the main repository
-- Delete the `agent-backend-fix` branch
-- Remove any leftover temporary files
+### Worktrees for new projects (deprecated)
 
-To protect work, `cleanup` refuses a worktree with uncommitted changes and refuses to delete a branch that isn't merged. Pass `--force` to discard them. It also never deletes a folder that Git doesn't list as one of the repository's worktrees.
-
-#### Another Example
-
-For a frontend agent worktree:
-
-```bash
-skelpro cleanup ./frontend-app ./frontend-app-agent-ui-redesign --branch agent-ui-redesign
-```
+`skelpro create <project> <template> --worktree --branch <name>` creates a new project as its own repository with a worktree beside it, and `skelpro cleanup <repoPath> <worktreePath> --branch <name>` removes it. It still works in v1.9, with a deprecation notice, and will be removed in v2.0: use `skelpro agents spawn` instead.
 
 ---
 
