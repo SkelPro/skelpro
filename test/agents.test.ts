@@ -84,14 +84,14 @@ describe("AGENTS.md composition", () => {
 
   it("keeps a template's own AGENTS.md and appends the layout", () => {
     expect(agentsMarkdown({ existing: "# Team rules\n\nBe kind.\n", projectName: "x", layout })).toBe(
-      "# Team rules\n\nBe kind.\n\n## Project layout\n\n- `tests/`: tests (required)\n",
+      "# Team rules\n\nBe kind.\n\n## Project layout\n\n- `tests/`: tests (required)\n\nCheck structure with `npx skelpro check`.\n",
     );
   });
 
   it("puts the layout at the marker when there is one", () => {
     const existing = `# Rules\n\n${LAYOUT_MARKER}\n\n## More\n`;
     expect(agentsMarkdown({ existing, projectName: "x", layout })).toBe(
-      "# Rules\n\n## Project layout\n\n- `tests/`: tests (required)\n\n## More\n",
+      "# Rules\n\n## Project layout\n\n- `tests/`: tests (required)\n\nCheck structure with `npx skelpro check`.\n\n## More\n",
     );
   });
 
@@ -136,7 +136,7 @@ describe("generated files", () => {
       {},
     );
     expect(out["AGENTS.md"]).toBe(
-      "# my-api\n\nWork only in src/billing.\n\n## Project layout\n\n- `src/billing/`: all billing code\n",
+      "# my-api\n\nWork only in src/billing.\n\n## Project layout\n\n- `src/billing/`: all billing code\n\nCheck structure with `npx skelpro check`.\n",
     );
     expect(JSON.parse(out[".skelpro.json"]).rules[0].match).toBe("src/billing/*.ts");
   });

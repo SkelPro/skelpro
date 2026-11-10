@@ -6,6 +6,10 @@ import main from "./src/index";
 import { createTemplate, scaffoldTemplate, describeTemplate } from "./src/actions";
 import { cleanupWorktree } from "./src/hooks/cleanupWorktree";
 import { applyInitPlan, planInitAgents } from "./src/template/init-agents";
+import { buildReport, exitCodeFor, listProjectPaths } from "./src/check/check";
+import { loadCheckConfig } from "./src/check/config";
+import { formatGithub, formatText } from "./src/check/format";
+import path from "path";
 
 // News and Updates...
 import logUpdates, { updatesDisabled } from "./src/hooks/logUpdates";
@@ -215,10 +219,58 @@ program
     );
   });
 
+program
+  .command("check [projectPath]")
+  .description("Check a project's structure against its layout and rules")
+  .option("--template <path>", "Check against a template instead of .skelpro.json")
+  .option(
+    "--var <name=value>",
+    "Template variable, with --template (repeatable)",
+    collect,
+    [],
+  )
+  .option("--json", "Print the report as JSON")
+  .option("--format <format>", "Output format: text, json or github", "text")
+  .option("--strict", "Fail on warnings too, not just errors")
+  .action(async (projectPath, opt) => {
+    const dir = path.resolve(projectPath ?? ".");
+    const format: string = opt.json ? "json" : opt.format;
+
+    try {
+      if (!["text", "json", "github"].includes(format)) {
+        throw new Error(`Unknown --format "${format}"; use text, json or github.`);
+      }
+      const vars: Record<string, string> = {};
+      for (const pair of opt.var as string[]) {
+        const eq = pair.indexOf("=");
+        if (eq <= 0) throw new Error(`Invalid --var "${pair}": use --var name=value.`);
+        vars[pair.slice(0, eq)] = pair.slice(eq + 1);
+      }
+      if (Object.keys(vars).length && !opt.template) {
+        throw new Error("--var only applies with --template.");
+      }
+
+      const loaded = await loadCheckConfig(dir, { template: opt.template, vars });
+      const report = buildReport(loaded.config, listProjectPaths(dir), loaded.template);
+
+      if (format === "json") process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+      else if (format === "github") process.stdout.write(formatGithub(report, path.basename(dir)));
+      else process.stdout.write(formatText(report, path.basename(dir)));
+
+      process.exitCode = exitCodeFor(report, Boolean(opt.strict));
+    } catch (error) {
+      // 2 = SkelPro couldn't run the check, as opposed to 1 = the project has errors.
+      console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+      process.exitCode = 2;
+    }
+  });
+
 // Runs after every command completes successfully
 program.hook("postAction", async (_program, actionCommand) => {
-  // Machine-readable output must stay parseable: no banner after --json.
-  if (updatesDisabled(program.opts().quiet) || actionCommand.opts().json) return;
+  // Machine-readable output must stay parseable: no banner after --json or --format json/github.
+  const opts = actionCommand.opts();
+  const machineReadable = opts.json || (opts.format !== undefined && opts.format !== "text");
+  if (updatesDisabled(program.opts().quiet) || machineReadable) return;
   try {
     await logUpdates();
   } catch {

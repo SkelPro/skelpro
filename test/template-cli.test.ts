@@ -136,7 +136,7 @@ describe("agent-ready output", { timeout: 90_000 }, () => {
     const r = await cli("create", "api", "./agent.json");
     expect(r.status, r.stderr).toBe(0);
     expect(read("api/AGENTS.md")).toBe(
-      "# api\n\nRun npm test.\n\n## Project layout\n\n- `tests/`: integration tests (required)\n",
+      "# api\n\nRun npm test.\n\n## Project layout\n\n- `tests/`: integration tests (required)\n\nCheck structure with `npx skelpro check`.\n",
     );
     expect(read("api/CLAUDE.md")).toMatch(/AGENTS\.md/);
     expect(JSON.parse(read("api/.skelpro.json")).template).toEqual({ name: "agent-api", source: "../agent.json" });

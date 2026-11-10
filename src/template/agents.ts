@@ -21,6 +21,8 @@ import {
 
 export const MANIFEST_FILE = ".skelpro.json";
 export const AGENTS_FILE = "AGENTS.md";
+/** Ends the layout section, so agents verify their own work against it. */
+export const CHECK_HINT = "Check structure with `npx skelpro check`.";
 /** Put this line in a template's own AGENTS.md to choose where the layout goes. */
 export const LAYOUT_MARKER = "<!-- skelpro:layout -->";
 
@@ -70,7 +72,7 @@ export function layoutSection(layout: ResolvedLayout): string {
     const notes = [entry.naming ? `${entry.naming} names` : "", entry.required ? "required" : ""].filter(Boolean);
     return `- \`${p}/\`: ${lowerFirst(entry.purpose)}${notes.length ? ` (${notes.join(", ")})` : ""}`;
   });
-  return `## Project layout\n\n${lines.join("\n")}\n`;
+  return `## Project layout\n\n${lines.join("\n")}\n\n${CHECK_HINT}\n`;
 }
 
 /**

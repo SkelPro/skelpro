@@ -84,6 +84,7 @@ SkelPro displays available actions and guides users through common workflows.
 | `skelpro create <project> <template>` | Generate a project from a template |
 | `skelpro info <template>` | Show a template's name, description, variables and files |
 | `skelpro init-agents [path]` | Add `AGENTS.md`, pointer files and `.skelpro.json` to an existing project |
+| `skelpro check [path]` | Check a project's structure against its layout and rules |
 | `skelpro cleanup <repoPath> <worktreePath>` | Remove a Git worktree and clean related references |
 | `skelpro --help` | Display available commands |
 
@@ -125,6 +126,16 @@ SkelPro displays available actions and guides users through common workflows.
 | `--no-pointers` | Don't add any pointer files |
 | `--dry-run` | Show what would change without writing anything |
 | `-f, --force` | Regenerate an existing `.skelpro.json` |
+
+### `check`
+
+| Option | Description |
+|--------|-------------|
+| `--template <path>` | Check against a template instead of `.skelpro.json` |
+| `--var <name=value>` | Template variable, with `--template` (repeatable) |
+| `--json` | Print the report as JSON |
+| `--format <format>` | `text` (default), `json` or `github` (pull request annotations) |
+| `--strict` | Fail on warnings too, not just errors |
 
 ### `cleanup`
 
@@ -201,6 +212,18 @@ A v2 template can describe what each folder is for (`layout`), structure rules (
 See [Agent-ready templates](docs/templates.md#agent-ready-templates) for the format.
 
 For a project that wasn't made with SkelPro, run `skelpro init-agents` in its folder. It adds the same three files, with a starting layout guessed from the folders that exist and a TODO for each one to fill in. It never overwrites an existing `AGENTS.md` or pointer file; use `--dry-run` to preview. See [Existing projects](docs/templates.md#existing-projects-skelpro-init-agents).
+
+### Checking Structure
+
+`skelpro check` compares a project with the layout and rules in its `.skelpro.json` and reports drift: missing required folders, forbidden files, naming problems, missing companion files such as tests, and folders that aren't in the layout.
+
+```bash
+skelpro check                  # exit code 0 = clean, 1 = errors, 2 = SkelPro couldn't run
+skelpro check --format github  # annotations on pull requests
+skelpro check --json           # for agents and tools
+```
+
+Generated `AGENTS.md` files tell coding agents to run it before they finish. See [Checking a project](docs/templates.md#checking-a-project-skelpro-check).
 
 ---
 

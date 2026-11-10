@@ -76,7 +76,7 @@ describe("a project with no agent files", () => {
 
     expect(read("AGENTS.md")).toBe(
       `# shop-api\n\n${TODO_INSTRUCTIONS}\n\n## Project layout\n\n` +
-        `- \`src/\`: ${TODO_PURPOSE}\n- \`src/routes/\`: ${TODO_PURPOSE}\n- \`tests/\`: ${TODO_PURPOSE}\n`,
+        `- \`src/\`: ${TODO_PURPOSE}\n- \`src/routes/\`: ${TODO_PURPOSE}\n- \`tests/\`: ${TODO_PURPOSE}\n\nCheck structure with \`npx skelpro check\`.\n`,
     );
     expect(read("CLAUDE.md")).toBe("See [AGENTS.md](AGENTS.md) for this project's conventions and layout.\n");
     expect(JSON.parse(read(".skelpro.json"))).toEqual({
@@ -108,13 +108,13 @@ describe("never overwrites existing work", () => {
     const plan = planInitAgents(root, opts);
     expect(plan.changes.find((c) => c.path === "AGENTS.md")!.action).toBe("append");
     applyInitPlan(plan);
-    expect(read("AGENTS.md")).toBe(`# Our rules\n\nUse pnpm.\n\n## Project layout\n\n- \`src/\`: ${TODO_PURPOSE}\n`);
+    expect(read("AGENTS.md")).toBe(`# Our rules\n\nUse pnpm.\n\n## Project layout\n\n- \`src/\`: ${TODO_PURPOSE}\n\nCheck structure with \`npx skelpro check\`.\n`);
   });
 
   it("puts the layout at the marker if there is one", () => {
     write("AGENTS.md", `# Rules\n\n${LAYOUT_MARKER}\n\n## Testing\n\nRun it.\n`);
     applyInitPlan(planInitAgents(root, opts));
-    expect(read("AGENTS.md")).toBe(`# Rules\n\n## Project layout\n\n- \`src/\`: ${TODO_PURPOSE}\n\n## Testing\n\nRun it.\n`);
+    expect(read("AGENTS.md")).toBe(`# Rules\n\n## Project layout\n\n- \`src/\`: ${TODO_PURPOSE}\n\nCheck structure with \`npx skelpro check\`.\n\n## Testing\n\nRun it.\n`);
   });
 
   it("leaves an AGENTS.md that already has a layout section untouched", () => {

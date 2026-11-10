@@ -234,6 +234,8 @@ Use pnpm. Run `pnpm test` before finishing. Never edit generated files in src/ge
 - `src/routes/`: HTTP route handlers, one file per resource (kebab-case names)
 - `src/services/`: business logic; no HTTP or database imports
 - `tests/`: integration tests (required)
+
+Check structure with `npx skelpro check`.
 ```
 
 `src/db` is left out because its `$when` is false. With `--var database=postgres` it would be listed too.
@@ -249,18 +251,18 @@ Keys are folder paths. Each entry has:
 | `required` | no | `true` if the folder must exist. |
 | `$when` | no | Only include this entry when the condition holds (same syntax as for files). |
 
-Paths and purposes can use `{{placeholders}}`. The layout is the single source of truth: SkelPro writes it into `AGENTS.md` and records it in `.skelpro.json`, and `skelpro check` (coming in a later release) checks projects against it, so the docs and the checks can't disagree.
+Paths and purposes can use `{{placeholders}}`. The layout is the single source of truth: SkelPro writes it into `AGENTS.md` and records it in `.skelpro.json`, and [`skelpro check`](#checking-a-project-skelpro-check) checks projects against it, so the docs and the checks can't disagree.
 
 ### `rules`
 
-Rules describe structure that `skelpro check` will enforce. There are two kinds:
+Rules describe structure that [`skelpro check`](#checking-a-project-skelpro-check) enforces. There are two kinds:
 
 | Kind | Fields | Example |
 |---|---|---|
 | Expected companion | `match`, `expect` | every `src/**/*.ts` should have a `src/**/*.test.ts` |
 | Forbidden files | `forbid`, optional `except` | no `*.js` in the root, except `*.config.js` |
 
-Every rule needs a kebab-case `id`. `severity` is `error`, `warn` or `info`; it defaults to `error` for forbid rules and `warn` for the others. Rules are validated and recorded in `.skelpro.json` today; checking them arrives with `skelpro check`.
+Every rule needs a kebab-case `id`. `severity` is `error`, `warn` or `info`; it defaults to `error` for forbid rules and `warn` for the others. For an expected-companion rule, the file names in `match` and `expect` must each contain exactly one `*` (`*.ts` and `*.test.ts`), so SkelPro can work out each file's companion. The folders map by their fixed prefix: with `src/**/*.ts` and `tests/**/*.test.ts`, `src/a/b.ts` should have `tests/a/b.test.ts`.
 
 ### `agents`
 
@@ -315,6 +317,8 @@ TODO: describe how to build, test and run this project, and any conventions agen
 - `src/`: TODO: describe what belongs here
 - `src/routes/`: TODO: describe what belongs here
 - `tests/`: TODO: describe what belongs here
+
+Check structure with `npx skelpro check`.
 ```
 
 It never overwrites your work:
@@ -326,6 +330,72 @@ It never overwrites your work:
 | `.skelpro.json` | The command stops: the project is already set up. `--force` regenerates the manifest only. |
 
 The purposes live in both `AGENTS.md` and `.skelpro.json`; fill in both before committing.
+
+## Checking a project: `skelpro check`
+
+`skelpro check` compares a project's structure with its layout and rules and reports drift. It looks at paths and names only, never file contents, and walks the project with the same ignore rules as `save`, so `node_modules`, build output and anything in `.gitignore` are skipped.
+
+```bash
+skelpro check                              # uses ./.skelpro.json
+skelpro check ./my-api                     # another folder
+skelpro check --template ./node-api.json   # check against a template directly
+skelpro check --json                       # machine-readable, for agents and tools
+skelpro check --format github              # inline annotations on pull requests
+skelpro check --strict                     # warnings fail too
+```
+
+Example output:
+
+```
+skelpro check: node-api v2 -- 2 errors, 1 warning, 1 note
+
+  error  scripts.js                not allowed in project root                  [no-root-scripts]
+  error  tests/                    required folder is missing                   [required]
+  warn   src/routes/UserRoutes.ts  use kebab-case: user-routes.ts               [naming]
+  info   helpers/                  isn't in the layout; did you mean src/lib/?  [unknown-folder]
+
+Suggested fixes (not run):
+  git mv "src/routes/UserRoutes.ts" "src/routes/user-routes.ts"
+```
+
+### What it checks
+
+| Check | Comes from | Example finding | Severity |
+|---|---|---|---|
+| Required folders | `layout` entries with `"required": true` | `tests/` is missing | error |
+| Forbidden files | `rules` with `forbid` | `scripts.js` in the root | the rule's (default error) |
+| Naming | `layout` entries with `naming` (files directly in that folder) | `src/routes/UserRoutes.ts` should be kebab-case | warn |
+| Expected companions | `rules` with `match` and `expect` | `src/services/billing.ts` has no `billing.test.ts` | the rule's (default warn) |
+| Unknown top-level folders | anything not covered by `layout` (hidden folders are skipped) | `helpers/` isn't in the layout; did you mean `src/lib/`? | info |
+| TODO purposes | purposes left as `TODO` by `init-agents` | `tests/` purpose is still a TODO | info |
+
+For a naming problem, `check` prints the `git mv` command that would fix it, but never runs it.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | No errors. Warnings and notes don't fail the check unless you pass `--strict`. |
+| `1` | Errors found (or warnings, with `--strict`). |
+| `2` | SkelPro couldn't run the check: no `.skelpro.json`, an invalid manifest or template, or a bad option. |
+
+### Switching a rule off for some paths
+
+Add an `ignore` block to `.skelpro.json`. Keys are rule ids (the name in brackets in the output); values are path globs. `"*"` switches every rule off for those paths:
+
+```json
+"ignore": {
+  "naming": ["src/routes/LegacyRoutes.ts"],
+  "colocated-unit-tests": ["src/gen/**"],
+  "*": ["experiments/**"]
+}
+```
+
+This lets a team adopt a rule gradually without fixing every old file first.
+
+### `--template`
+
+`--template <path or URL>` checks against a template's layout and rules instead of `.skelpro.json`. Its placeholders are filled from the variable values recorded in the project's `.skelpro.json` (if there is one), then from `--var name=value`, then from the template's defaults. The `ignore` block in `.skelpro.json` still applies.
 
 ## Editor support
 
