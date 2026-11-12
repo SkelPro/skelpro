@@ -63,7 +63,7 @@ Install SkelPro globally using npm:
 npm install -g skelpro
 ```
 
-> **Prerequisite:** Node.js version 18 or higher is required.
+> **Prerequisite:** Node.js version 20 or higher is required.
 
 ---
 

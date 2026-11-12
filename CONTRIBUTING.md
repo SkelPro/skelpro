@@ -62,7 +62,7 @@ git checkout -b your-branch-name
 npm ci
 ```
 
-Use Node.js 18 or newer.
+Use Node.js 20 or newer (22 or newer to run a release locally).
 
 #### 5. Make Your Changes
 
@@ -145,7 +145,7 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 
 ## Continuous Integration and Releases
 
-- Every pull request runs the type-check, build and tests on Linux, macOS and Windows with Node 18, 20 and 22. Path handling and Python venv paths differ on Windows, so please don't ignore a failure on just one OS.
+- Every pull request runs the type-check, build and tests on Linux, macOS and Windows with Node 20, 22 and 24. Path handling and Python venv paths differ on Windows, so please don't ignore a failure on just one OS.
 - **Releases come only from CI.** Merging to `main` runs the tests, then semantic-release bumps the version, publishes to npm with provenance, and creates the GitHub release. Never run `npm publish` from your machine: a local publish can ship code that isn't in the repository.
 
 - Ensure your branch is **up to date** with `main`.  
