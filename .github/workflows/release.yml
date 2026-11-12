@@ -9,7 +9,7 @@ permissions:
   contents: write # create GitHub releases and tags
   issues: write
   pull-requests: write
-  id-token: write # npm provenance
+  id-token: write # npm trusted publishing (OIDC) and provenance
 
 jobs:
   release:
@@ -17,12 +17,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/checkout@v5
         with:
-          node-version: 20
+          # semantic-release reads every commit and tag since the last
+          # release to choose the next version; a shallow clone breaks that.
+          fetch-depth: 0
+
+      # semantic-release 25 needs Node ^22.14 or >=24.10. Node 24 also ships
+      # npm 11, which npm trusted publishing requires.
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       - name: Install Dependencies
@@ -35,6 +41,9 @@ jobs:
       - name: Test
         run: npm test
 
+      # Publishing to npm uses trusted publishing (no stored token) once the
+      # package is linked to this workflow on npmjs.com. An NPM_TOKEN secret
+      # still works instead, if one is set.
       - name: Release
         run: npx semantic-release
         env:
