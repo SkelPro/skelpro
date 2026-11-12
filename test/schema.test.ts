@@ -28,7 +28,7 @@ const errors = () => ajv.errorsText(validate.errors);
 
 /** The full example from docs/templates.md. */
 function docsExample(): unknown {
-  const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8");
+  const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8").replace(/\r\n/g, "\n"); // Windows checkouts may use CRLF
   const block = /## A complete v2 example\s+```json\n([\s\S]*?)```/.exec(md);
   return JSON.parse(block![1]);
 }
@@ -39,7 +39,7 @@ describe("schema/template-v2.json", () => {
   });
 
   it("accepts the agent-ready example in docs/templates.md", () => {
-    const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8");
+    const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8").replace(/\r\n/g, "\n"); // Windows checkouts may use CRLF
     const section = md.slice(md.indexOf("## Agent-ready templates"));
     const example = JSON.parse(/```json\n([\s\S]*?)```/.exec(section)![1]);
     expect(validate(example), errors()).toBe(true);

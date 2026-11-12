@@ -18,7 +18,7 @@ const NOW = new Date(2026, 10, 9);
 
 /** The JSON and markdown examples from docs/templates.md#agent-ready-templates. */
 function docsExample(): { template: any; agentsMd: string } {
-  const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8");
+  const md = fs.readFileSync(path.join(ROOT, "docs", "templates.md"), "utf8").replace(/\r\n/g, "\n"); // Windows checkouts may use CRLF
   const section = md.slice(md.indexOf("## Agent-ready templates"));
   const json = /```json\n([\s\S]*?)```/.exec(section)![1];
   const agents = /```markdown\n([\s\S]*?)```/.exec(section)![1];

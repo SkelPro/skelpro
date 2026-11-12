@@ -43,7 +43,11 @@ export function saveTemplate(request: SaveRequest): SaveResult {
   const { sourceDir, name, outDir, limits } = request;
 
   if (!NAME.test(name)) {
-    throw new SkelproError("invalid_input", `Invalid template name "${name}".`, "Use letters, digits, ., _ and -.");
+    throw new SkelproError(
+      "invalid_input",
+      `Invalid template name "${name}".`,
+      "Use letters, digits, ., _ and -.",
+    );
   }
   if (!fs.existsSync(sourceDir) || !fs.statSync(sourceDir).isDirectory()) {
     throw new SkelproError("not_found", `${sourceDir} is not a folder.`);
@@ -59,10 +63,16 @@ export function saveTemplate(request: SaveRequest): SaveResult {
   }
 
   const skippedPaths: string[] = [];
-  const tree = createJSON(sourceDir, { include: request.include, exclude: request.exclude, skipped: skippedPaths });
+  const tree = createJSON(sourceDir, {
+    include: request.include,
+    exclude: request.exclude,
+    skipped: skippedPaths,
+  });
   const skipped = skippedPaths.map((p) => ({
     path: p,
-    reason: (request.exclude ?? []).some((g) => minimatch(p.replace(/\/$/, ""), g, { dot: true }))
+    reason: (request.exclude ?? []).some((g) =>
+      minimatch(p.replace(/\/$/, ""), g, { dot: true }),
+    )
       ? "matches exclude"
       : "ignored: in .gitignore or never source (dependencies, build output, secrets)",
   }));
@@ -72,7 +82,11 @@ export function saveTemplate(request: SaveRequest): SaveResult {
   let unusedVariables: string[] | undefined;
   if (request.variables && Object.keys(request.variables).length) {
     try {
-      const reversed = reverseTemplate(tree, { name, description: request.description, vars: request.variables });
+      const reversed = reverseTemplate(tree, {
+        name,
+        description: request.description,
+        vars: request.variables,
+      });
       output = reversed.template;
       replacements = reversed.summary;
       unusedVariables = reversed.unused;
