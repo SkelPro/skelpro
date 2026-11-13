@@ -67,7 +67,7 @@
     "ajv": "^8.20.0",
     "semantic-release": "^25.0.9",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "vite": "^6.4.6",
     "vitest": "^4.1.12"
   },
