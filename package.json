@@ -48,7 +48,7 @@
   "homepage": "https://github.com/SkelPro/skelpro#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
-    "commander": "^13.0.0",
+    "commander": "^15.1.0",
     "ignore": "^7.0.14",
     "inquirer": "^12.3.0",
     "minimatch": "^11.0.8",
