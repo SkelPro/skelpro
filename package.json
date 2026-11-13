@@ -12,7 +12,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "description": "SkelPro – where projects get their bones structured.",
   "scripts": {
@@ -51,25 +51,25 @@
     "commander": "^13.0.0",
     "ignore": "^7.0.14",
     "inquirer": "^12.3.0",
-    "minimatch": "^10.2.5",
+    "minimatch": "^11.0.8",
     "ora": "^5.4.1",
     "tonelog": "^2.0.7",
     "typeglide": "^1.2.4",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/github": "^12.0.6",
-    "@semantic-release/npm": "^13.1.5",
-    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@semantic-release/github": "^12.0.11",
+    "@semantic-release/npm": "^13.2.0",
+    "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.10.5",
     "ajv": "^8.20.0",
-    "semantic-release": "^25.0.3",
+    "semantic-release": "^25.0.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "vite": "^6.4.6",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.12"
   },
   "overrides": {
     "vite": "$vite"

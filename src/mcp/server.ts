@@ -64,7 +64,7 @@ async function guard(body: () => Promise<unknown>): Promise<ToolResult> {
 }
 
 const variablesSchema = z
-  .record(z.union([z.string(), z.number(), z.boolean()]))
+  .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
   .optional()
   .describe("Template variable values, by name. describe_template lists the variables, their types and defaults.");
 
@@ -279,7 +279,7 @@ export function createServer(options: ServerOptions): McpServer {
         sourceDir: z.string().describe("Project folder to save, relative to the server's folder."),
         name: z.string().describe("Template name (letters, digits, . _ -)."),
         variables: z
-          .record(z.string())
+          .record(z.string(), z.string())
           .optional()
           .describe('Values to turn into placeholders, e.g. {"projectName": "my-api", "port": "3000"}.'),
         description: z.string().optional().describe("What the template creates (needs variables)."),

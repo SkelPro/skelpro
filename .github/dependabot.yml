@@ -1,0 +1,39 @@
+# Keeps dependencies current with small weekly pull requests, so updates
+# don't pile up into a large security backlog. CI tests each pull request.
+#
+# Commit messages follow Conventional Commits, so they pass the CI commit
+# check and semantic-release handles them correctly:
+#   fix(deps):   runtime dependencies -> a patch release on merge
+#   chore(deps): development dependencies -> no release
+#   ci:          GitHub Actions -> no release
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "fix(deps)"
+      prefix-development: "chore(deps)"
+    groups:
+      # Minor and patch updates arrive as one pull request per type.
+      # Major updates still get their own pull request, to review one at a time.
+      runtime:
+        dependency-type: production
+        update-types: [minor, patch]
+      development:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
