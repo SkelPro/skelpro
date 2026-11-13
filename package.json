@@ -50,7 +50,7 @@
     "@modelcontextprotocol/sdk": "^1.32.2",
     "commander": "^13.0.0",
     "ignore": "^7.0.14",
-    "inquirer": "^12.3.0",
+    "inquirer": "^14.2.5",
     "minimatch": "^11.0.8",
     "ora": "^10.0.0",
     "tonelog": "^2.0.7",
