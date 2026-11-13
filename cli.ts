@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// Must be first: stops with a clear message on Node.js versions SkelPro doesn't support.
+import "./src/utils/require-node";
 import { Command } from "commander";
 import { VERSION } from "./src/utils/constant";
 import main from "./src/index";
