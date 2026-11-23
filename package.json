@@ -65,7 +65,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.10.5",
     "ajv": "^8.20.0",
-    "semantic-release": "^25.0.9",
+    "semantic-release": "^26.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "vite": "^6.4.6",
